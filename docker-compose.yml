@@ -1,0 +1,18 @@
+version: '3'
+services:
+  node-app:
+    build: .
+    ports:
+      - '7890:7890'
+    environment:
+      - PORT=7890
+  mongo:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=imran
+      - MONGO_INITDB_ROOT_PASSWORD=test_password
+    volumes:
+      - mongo-db:/data/db
+
+volumes:
+  mongo-db:
