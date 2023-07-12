@@ -1,4 +1,4 @@
-import { CustomError } from "../errors/customError"
+import { CustomError } from "../errors/custom-error"
 import { ErrorRequestHandler } from "express"
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {

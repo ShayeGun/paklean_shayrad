@@ -1,7 +1,7 @@
 import { CustomError } from "./custom-error";
 
-class RouteError extends CustomError {
-    statusCode = 404;
+class AuthError extends CustomError {
+    statusCode = 401;
 
     constructor(msg: string) {
         super(msg);
@@ -10,4 +10,4 @@ class RouteError extends CustomError {
     }
 }
 
-export { RouteError }
+export { AuthError }

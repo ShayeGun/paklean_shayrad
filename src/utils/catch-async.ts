@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { CustomError } from "../errors/customError";
+import { CustomError } from "../errors/custom-error";
 
 export const catchAsync = <T extends (req: Request, res: Response, next: NextFunction) => Promise<any>>(func: T) => {
     return (req: Request, res: Response, next: NextFunction) => {

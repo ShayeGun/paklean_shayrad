@@ -12,7 +12,7 @@ interface IUser {
 }
 
 interface IUserMethods {
-    correctPassword(): string
+    correctPassword(password: any): string
 }
 
 type UserModel = Model<IUser, {}, IUserMethods>;

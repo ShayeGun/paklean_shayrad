@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { catchAsync } from "../utils/catch-async";
 import { registerUser, loginUser } from "../controllers/user";
-import { authentication } from "../controllers/auth/auth";
+import { signup, signin } from "../controllers/auth";
 import { User } from "../models/user";
 
 const router = Router();
@@ -9,11 +9,11 @@ const router = Router();
 router.route('/register')
     .post(catchAsync(registerUser))
 
-router.route('/login')
-    .post(catchAsync(loginUser))
+router.route('/signin')
+    .post(catchAsync(signin))
 
 router.route('/signup')
-    .post(catchAsync(authentication))
+    .post(catchAsync(signup))
 
 router.route('/hello')
     .all(async (req, res) => {
