@@ -1,13 +1,17 @@
 import { app } from './app'
 import env from 'dotenv'
 import mongoose from "mongoose"
+import { checkEnvVar } from './utils/check-environment-variables';
 
 env.config({ path: `${__dirname}/.env` });
 
-mongoose.connect('mongodb://shy-mongo:27017/police').then(() => {
-    console.log('MongoDB connected');
+// environment variables check
+checkEnvVar('PORT', 'TOKEN_URL', 'SERVER_ADDRESS', 'JWT_SECRET', 'MONGODB_URL', 'JWT_EXP')
+
+mongoose.connect(process.env.MONGODB_URL!).then(() => {
+    console.log('Shayrad MongoDB connected');
 }).catch((err) => {
-    console.error('MongoDB connection error', err);
+    console.error('Shayrad MongoDB connection error', err);
 });
 
 app.listen(process.env.PORT, () => {
