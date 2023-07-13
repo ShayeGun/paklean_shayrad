@@ -1,4 +1,4 @@
-import { CustomError } from "../errors/custom-error"
+import { CustomError } from "./errors/custom-error"
 import { ErrorRequestHandler } from "express"
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
@@ -7,10 +7,18 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
             errMsg: err.message
         })
     }
-    else {
-        console.error(err);
-        res.status(500);
+
+    else if (err._message) {
+        res.status(501).send('oh no unhandled error this is end of heavens and earth 😨');
     }
+
+    else {
+        console.log(Object.keys(err.errors));
+        console.error(err);
+
+        res.status(500).send('oh no unhandled error this is end of the world 😨');
+    }
+
 }
 
 export { errorHandler }

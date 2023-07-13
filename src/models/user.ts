@@ -1,5 +1,6 @@
 import { Model, model, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
+import validator from 'validator';
 
 interface IUser {
     firstName: string;
@@ -23,14 +24,32 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
     password: {
         type: String,
         required: true,
-        minlength: 8,
         select: false,
+        validate: [{
+            validator: function checkPassword(str: string) {
+                var re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+                return re.test(str);
+            },
+            message: 'password must be at least 8 characters and with a symbol, number, lower and upper-case letters'
+        }]
     },
-    nationalCode: { type: String, required: true },
-    phone: { type: String, required: true },
+    nationalCode: {
+        type: String, required: true,
+        unique: true,
+        maxlength: 10,
+        minlength: 10,
+        validate: [validator.isNumeric, 'not valid national-code']
+    },
+    phone: {
+        type: String, required: true, unique: true,
+        maxlength: 11,
+        minlength: 11,
+        validate: [validator.isMobilePhone, 'not valid phone number']
+    },
     email: {
         type: String, required: true, unique: true,
         lowercase: true,
+        validate: [validator.isEmail, 'not valid email']
     }
 });
 
