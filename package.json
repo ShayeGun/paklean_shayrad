@@ -5,13 +5,16 @@
   "main": "server.ts",
   "scripts": {
     "start": "ts-node ./src/server.ts",
-    "test": "jest --watchAll --no-cache",
+    "test": "jest --watchAll --no-cache ./tests",
     "else": "ts-node .src/utils/signfile.ts",
     "dev": "ts-node-dev --files --clear ./src/server.ts"
   },
   "jest": {
     "preset": "ts-jest",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "./src/tests/setup.ts"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -28,6 +31,7 @@
     "express-rate-limit": "^6.7.1",
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.1",
+    "mongodb-memory-server": "^8.13.0",
     "mongoose": "^7.3.2",
     "typescript": "^5.1.3",
     "validator": "^13.9.0"
