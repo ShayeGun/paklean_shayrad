@@ -8,7 +8,6 @@ const sendError = (err: CustomError | Error, res: Response) => {
     }
     else {
         console.log(err);
-        console.log(Object.keys(err));
 
         res.status(500).send('oh oh sth bad happened 😓')
 
@@ -17,6 +16,13 @@ const sendError = (err: CustomError | Error, res: Response) => {
 
 function handleDuplicateFieldDB() {
     return new CustomError('Duplication of data', 400, 1001)
+}
+
+function handleValidation(err: any) {
+    // const errorSubject = err
+    console.log(Object.keys(err.errors));
+
+    return new CustomError(`${err._message}: ${Object.keys(err.errors)}`, 400, 1001)
 }
 
 function handleJWTError() {
@@ -33,6 +39,11 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 
     if (err.code === 11000) {
         error = handleDuplicateFieldDB();
+    }
+
+
+    if (error._message === 'User validation failed') {
+        error = handleValidation(err);
     }
 
     if (error.name === 'JsonWebTokenError') {

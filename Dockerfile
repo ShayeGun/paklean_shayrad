@@ -17,4 +17,4 @@ COPY . .
 
 EXPOSE 7890
 
-CMD [ "npm","run","test" ]
+CMD [ "npm","run","dev" ]
