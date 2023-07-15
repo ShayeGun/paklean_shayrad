@@ -14,7 +14,7 @@ function createSendToken(user: Record<string, any>, statusCode: number, res: Res
 
     const cookiesOpt: ICookie = {
         httpOnly: true,
-        expires: new Date(Date.now() + 360000),
+        expires: new Date(Date.now() + (+process.env.JWT_EXPIRES_AT! as number * 1000)),
     };
     // only in production use HTTPs
     // if (process.env.NODE_ENV === 'production') cookiesOpt.secure = true;

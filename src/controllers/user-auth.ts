@@ -1,9 +1,8 @@
 import env from 'dotenv'
 import { Request, Response, NextFunction } from 'express'
 import { User } from '../models/user'
-import { createSendToken, verifyJWT } from '../utils/jwt/jwt'
-import { AuthError } from '../utils/errors/authorize-error'
-import { JwtPayload } from 'jsonwebtoken'
+import { createSendToken, verifyJWT } from '../utils/jwt-handler'
+import { CustomError } from '../utils/custom-error'
 
 env.config({ path: `${__dirname}/../../.env` })
 
@@ -20,14 +19,14 @@ const signin = async (req: Request, res: Response, next: NextFunction) => {
 
     // 1) if there is no nationalCode or password
     if (!nationalCode || !password) {
-        return next(new AuthError('please enter nationalCode and password'));
+        return next(new CustomError('please enter nationalCode and password', 401, 1101));
     }
 
     // 2) check if nationalCode and password are valid
     const user = await User.findOne({ nationalCode }).select('+password');
 
     if (!user || !(await user.correctPassword(password))) {
-        return next(new AuthError('nationalCode or password is invalid 😕'));
+        return next(new CustomError('nationalCode or password is invalid 😕', 401, 1102));
     }
     // 3) if every thing was OK
     createSendToken(user, 200, res);
@@ -41,7 +40,7 @@ const validateUser = async (req: Request, res: Response, next: NextFunction) => 
         token = req.cookies.jwt;
 
     if (!token) {
-        return next(new AuthError('Not logged in 😒'));
+        return next(new CustomError('Not logged in 😒', 401, 1103));
     }
 
     // if token is valid
@@ -51,7 +50,7 @@ const validateUser = async (req: Request, res: Response, next: NextFunction) => 
     const existedUser = await User.findById(decode.id);
 
     if (!existedUser) {
-        return next(new AuthError('RIP good old user 💀'));
+        return next(new CustomError('RIP good old user 💀', 401, 1104));
     }
 
     // // check if password was not changed
@@ -71,7 +70,7 @@ const validateUser = async (req: Request, res: Response, next: NextFunction) => 
 const strictTo = (...roles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         if (!roles.includes(req.user!.role))
-            return next(new AuthError('you\'re not allowed to do this 😑'))
+            return next(new CustomError('you\'re not allowed to do this 😑', 401, 1105))
     }
 }
 

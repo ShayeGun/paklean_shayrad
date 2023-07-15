@@ -5,8 +5,8 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit'
 import ExpressMongoSanitize from 'express-mongo-sanitize';
 import { userRoute } from './routes/user-router';
-import { errorHandler } from './utils/error-handler';
-import { RouteError } from './utils/errors/route-error';
+import { errorHandler } from './controllers/error-handler';
+import { CustomError } from './utils/custom-error';
 import { catchAsync } from './utils/catch-async';
 
 const app = express();
@@ -36,7 +36,7 @@ app.route('/api/v1/hello')
     })
 app.use('/api/v1/user', userRoute);
 app.use('*', (req, res, next) => {
-    next(new RouteError('No Such URL Sry 🥲'))
+    next(new CustomError('No Such URL Sry 🥲', 404, 404))
 })
 
 app.use(errorHandler)
