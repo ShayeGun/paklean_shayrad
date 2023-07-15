@@ -68,4 +68,11 @@ const validateUser = async (req: Request, res: Response, next: NextFunction) => 
     next();
 }
 
-export { signup, signin, validateUser }
+const strictTo = (...roles: string[]) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        if (!roles.includes(req.user!.role))
+            return next(new AuthError('you\'re not allowed to do this 😑'))
+    }
+}
+
+export { signup, signin, validateUser, strictTo }

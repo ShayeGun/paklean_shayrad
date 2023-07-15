@@ -14,6 +14,18 @@ mongoose.connect(process.env.MONGODB_URL!).then(() => {
     console.error('Shayrad MongoDB connection error', err);
 });
 
-app.listen(process.env.PORT, () => {
-    console.log(`listening on port ${process.env.PORT} ...`);
+const port = process.env.PORT || 7890;
+
+const server = app.listen(port, () => {
+    console.log(`listening on port ${port} ...`);
 })
+
+process.on('unhandledRejection', (err: Error) => {
+    console.log(err.name, err.message);
+
+    server.close(() => {
+        console.log('App in shutting down ❌');
+
+        process.exit(1);
+    });
+});

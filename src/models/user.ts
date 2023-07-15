@@ -2,6 +2,11 @@ import { Model, model, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 
+enum Roles {
+    user = "user",
+    admin = "admin"
+}
+
 interface IUser {
     firstName: string;
     lastName: string;
@@ -10,6 +15,7 @@ interface IUser {
     nationalCode: string;
     phone: string;
     email: string;
+    role: Roles;
 }
 
 interface IUserMethods {
@@ -50,6 +56,11 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
         type: String, required: true, unique: true,
         lowercase: true,
         validate: [validator.isEmail, 'not valid email']
+    },
+    role: {
+        type: String,
+        enum: Roles,
+        default: Roles.user
     }
 });
 

@@ -2,46 +2,39 @@ import express from 'express';
 import cookieParser from "cookie-parser";
 import helmet from 'helmet';
 import cors from 'cors';
-
+import rateLimit from 'express-rate-limit'
+import ExpressMongoSanitize from 'express-mongo-sanitize';
 import { userRoute } from './routes/user-router';
 import { errorHandler } from './utils/error-handler';
 import { RouteError } from './utils/errors/route-error';
 import { catchAsync } from './utils/catch-async';
 
 const app = express();
-app.use(express.json());
+app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser());
-app.use(
-    helmet({
-        hsts: {
-            maxAge: 31536000,
-        },
-        contentSecurityPolicy: {
-            useDefaults: false,
-            directives: {
-                "default-src": ["'none'"],
-                "frame-ancestors": ["'none'"],
-            },
-        },
-        frameguard: {
-            action: "deny",
-        },
-    })
-);
 
-app.use(
-    cors({
-        methods: ["GET"],
-        allowedHeaders: ["Authorization", "Content-Type", "Cookie"],
-        maxAge: 86400,
-    })
-);
+// =========== SECURITY ===========
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: 'give a break to server for one hour 😮‍💨'
+})
 
-app.route('/hello')
+app.use(express.json({ limit: '10kb' }));
+app.use(helmet());
+app.use(cors());
+app.use(ExpressMongoSanitize());
+app.use('/api', limiter);
+
+// =========== END SECURITY ===========
+
+app.route('/api/v1/hello')
     .all(async (req, res) => {
         res.send('hello baby 😉')
     })
-app.use('/user', userRoute);
+app.use('/api/v1/user', userRoute);
 app.use('*', (req, res, next) => {
     next(new RouteError('No Such URL Sry 🥲'))
 })
