@@ -2,7 +2,7 @@ import { CustomError } from "../utils/custom-error"
 import { ErrorRequestHandler, Response } from "express"
 
 const sendError = (err: CustomError | Error, res: Response) => {
-    if (err instanceof CustomError) {
+    if (err instanceof CustomError && err.errInfo().status === 'fail') {
         res.status(err.errStatus());
         res.json(err.errInfo());
     }
@@ -15,14 +15,11 @@ const sendError = (err: CustomError | Error, res: Response) => {
 }
 
 function handleDuplicateFieldDB() {
-    return new CustomError('Duplication of data', 400, 1001)
+    return new CustomError('Duplication of data', 400, 1101)
 }
 
 function handleValidation(err: any) {
-    // const errorSubject = err
-    console.log(Object.keys(err.errors));
-
-    return new CustomError(`${err._message}: ${Object.keys(err.errors)}`, 400, 1001)
+    return new CustomError(`${err._message}: ${Object.keys(err.errors)}`, 400, 1102)
 }
 
 function handleJWTError() {

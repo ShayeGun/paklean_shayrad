@@ -1,6 +1,5 @@
 import request from "supertest";
 import { app } from "../app";
-import mongoose from "mongoose";
 
 describe('server stuff', () => {
     it('check server availability', async () => {
