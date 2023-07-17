@@ -5,6 +5,7 @@ import { app } from "../app";
 import mongoose from 'mongoose';
 import jwt from "jsonwebtoken";
 import { User } from "../models/user";
+import { response } from "express";
 
 // ===================== SIGNUP USER =====================
 
@@ -117,24 +118,30 @@ describe('user signup', () => {
 
     })
 
-
     it('verify jwt expiration date', async () => {
         function sleep(ms: number) {
             return new Promise((resolve) => {
                 setTimeout(resolve, ms);
             });
         }
-        const response = await request(app).post(signupURL).send(credential);
 
-        const token = response.body.token
+        // change process.env.JWT_EXPIRES_AT for testing jwt expiration time
+        const processEnvTime = process.env.JWT_EXPIRES_AT
+        process.env.JWT_EXPIRES_AT = '1';
 
-        await sleep(2000);
+        const userResponse = await request(app).post(signupURL).send(credential);
 
-        const result: any = await verifyJWT(token);
+        // revert process.env.JWT_EXPIRES_AT to its original value
+        process.env.JWT_EXPIRES_AT = processEnvTime;
+        await sleep(5);
+
+        const tokenResponse = await request(app).get('/api/v1/user/hello').set('Cookie', [`jwt=${userResponse.body.token}`])
+
+        expect(tokenResponse.body.code).toBe(1202)
+        expect(tokenResponse.body.status).toBe('fail')
 
     })
 })
-
 
 // ===================== SIGNIN USER =====================
 
@@ -231,6 +238,30 @@ describe('user signin', () => {
         const decodedToken: any = await verifyJWT(token);
 
         expect(response.body.user._id).toBe(decodedToken.id);
+    })
+
+    it('verify jwt expiration date', async () => {
+        function sleep(ms: number) {
+            return new Promise((resolve) => {
+                setTimeout(resolve, ms);
+            });
+        }
+
+        // change process.env.JWT_EXPIRES_AT for testing jwt expiration time
+        const processEnvTime = process.env.JWT_EXPIRES_AT
+        process.env.JWT_EXPIRES_AT = '1';
+
+        const userResponse = await request(app).post(signinURL).send(credential);
+
+        // revert process.env.JWT_EXPIRES_AT to its original value
+        process.env.JWT_EXPIRES_AT = processEnvTime;
+        await sleep(5);
+
+        const tokenResponse = await request(app).get('/api/v1/user/hello').set('Cookie', [`jwt=${userResponse.body.token}`])
+
+        expect(tokenResponse.body.code).toBe(1202)
+        expect(tokenResponse.body.status).toBe('fail')
+
     })
 })
 
