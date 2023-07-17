@@ -15,4 +15,4 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-CMD [ "npm","run","test" ]
+CMD [ "npm","run","dev" ]

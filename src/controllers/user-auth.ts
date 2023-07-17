@@ -3,17 +3,18 @@ import { Request, Response, NextFunction } from 'express'
 import { User } from '../models/user'
 import { createSendToken, verifyJWT } from '../utils/jwt-handler'
 import { CustomError } from '../utils/custom-error'
+import { catchAsync } from '../utils/catch-async'
 
 env.config({ path: `${__dirname}/../../.env` })
 
-const signup = async (req: Request, res: Response, next: NextFunction) => {
+const signup = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const user = new User(req.body);
     await user.save()
 
     createSendToken(user, 201, res);
-}
+})
 
-const signin = async (req: Request, res: Response, next: NextFunction) => {
+const signin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const nationalCode = req.body.nationalCode;
     const password = req.body.password;
 
@@ -30,9 +31,9 @@ const signin = async (req: Request, res: Response, next: NextFunction) => {
     }
     // 3) if every thing was OK
     createSendToken(user, 200, res);
-};
+})
 
-const validateUser = async (req: Request, res: Response, next: NextFunction) => {
+const validateUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // if token exist
     let token
 
@@ -65,7 +66,7 @@ const validateUser = async (req: Request, res: Response, next: NextFunction) => 
     req.user = existedUser;
 
     next();
-}
+})
 
 const strictTo = (...roles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {

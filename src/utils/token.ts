@@ -5,17 +5,19 @@ env.config({ path: `${__dirname}/../.env` });
 
 interface IToken {
     accessToken: string;
-    expiresIn: Date;
+    createdAt: number;
+    expiresIn: number;
     tokenType: string;
-    scope: "api_scope";
+    scope: string;
 }
 
 class Token {
     private static instance: Token;
-    declare private accessToken: IToken["accessToken"]
-    declare private tokenType: IToken["tokenType"]
-    declare private expiresIn: IToken["expiresIn"]
-    private scope: IToken["scope"] = "api_scope"
+    declare private createdAt: IToken["createdAt"];
+    declare private accessToken: IToken["accessToken"];
+    declare private tokenType: IToken["tokenType"];
+    declare private expiresIn: IToken["expiresIn"];
+    declare private scope: IToken["scope"];
 
     private constructor() { }
 
@@ -27,11 +29,11 @@ class Token {
     }
 
     // FIX:
-    public async login() {
+    private async login() {
         const { data } = await axios.post(`${process.env.TOKEN_URL}`, {
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET,
-            grant_type: "client_credentials"
+            grant_type: process.env.GRANT_TYPE
         }, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -39,21 +41,20 @@ class Token {
         }
         )
 
-        this.accessToken = data.accessToken
-        this.tokenType = data.expire
+        this.createdAt = Date.now();
 
+        this.accessToken = data.accessToken
+        // convert seconds milliseconds
+        this.expiresIn = data.expires_in * 1000
+        this.tokenType = data.token_type
+        this.scope = data.scope
     }
 
     // FIX:
-    public async refresh() {
-        try {
+    public async checkValidity() {
 
-            // const date = new Date();
-            // if (date.toISOString() > this.expiresIn.toISOString()) this.login();
-
-        } catch (err: any) {
-            console.error(err);
-        }
+        if ((Date.now() - this.createdAt) > this.expiresIn || !this.accessToken)
+            await this.login();
 
     }
 
@@ -62,6 +63,7 @@ class Token {
             accessToken: this.accessToken,
             tokenType: this.tokenType,
             scope: this.scope,
+            createdAt: this.createdAt,
             expiresIn: this.expiresIn
         }
     }
@@ -70,4 +72,4 @@ class Token {
 
 const token = Token.build();
 
-export { token }
+export { token, Token }

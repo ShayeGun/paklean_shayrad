@@ -6,7 +6,7 @@ import { checkEnvVar } from './utils/check-environment-variables';
 env.config({ path: `${__dirname}/.env` });
 
 // environment variables check
-checkEnvVar('PORT', 'TOKEN_URL', 'SERVER_ADDRESS', 'JWT_SECRET', 'MONGODB_URL', 'JWT_EXPIRES_AT')
+checkEnvVar('PORT', 'TOKEN_URL', 'GRANT_TYPE', 'SERVER_ADDRESS', 'JWT_SECRET', 'MONGODB_URL', 'JWT_EXPIRES_AT')
 
 mongoose.connect(process.env.MONGODB_URL!).then(() => {
     console.log('Shayrad MongoDB connected');

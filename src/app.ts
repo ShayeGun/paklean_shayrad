@@ -7,6 +7,7 @@ import ExpressMongoSanitize from 'express-mongo-sanitize';
 import { userRoute } from './routes/user-router';
 import { errorHandler } from './controllers/error-handler';
 import { CustomError } from './utils/custom-error';
+import { token } from './utils/token';
 import { catchAsync } from './utils/catch-async';
 
 const app = express();
@@ -30,11 +31,20 @@ app.use('/api', limiter);
 
 // =========== END SECURITY ===========
 
+// check validity of token with each request
+// app.use(catchAsync(async (req, res, next) => {
+//     await token.checkValidity()
+//     next()
+// }))
+
+// FIX:
 app.route('/api/v1/hello')
     .all(async (req, res) => {
         res.send('hello baby 😉')
     })
+
 app.use('/api/v1/user', userRoute);
+
 app.use('*', (req, res, next) => {
     next(new CustomError('No Such URL Sry 🥲', 404, 404))
 })
