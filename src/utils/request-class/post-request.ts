@@ -33,7 +33,13 @@ class PostRequest extends ApiRequest<IPostRequest> {
     }
 
     setHeader(header: IPostRequest['header']) {
+        if (!header) {
+            this.header = {}
+            return this
+        }
         this.header = header
+
+        return this
     }
 
     async call(): Promise<any> {
@@ -47,6 +53,9 @@ class PostRequest extends ApiRequest<IPostRequest> {
         if (this.data) requestConfig.data = this.data
 
         const { data } = await axios(requestConfig)
+
+        console.log(data);
+
 
         return data
     }

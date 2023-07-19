@@ -23,7 +23,13 @@ class GetRequest extends ApiRequest<IGetRequest> {
     }
 
     setHeader(header: IGetRequest['header']) {
+        if (!header) {
+            this.header = {}
+            return this
+        }
         this.header = header
+
+        return this
     }
 
     async call(): Promise<any> {

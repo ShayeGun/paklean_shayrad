@@ -5,23 +5,22 @@ import { app } from "../app";
 import mongoose from 'mongoose';
 import jwt from "jsonwebtoken";
 import { User } from "../models/user";
-import { response } from "express";
 
 // ===================== SIGNUP USER =====================
 
 describe('user signup', () => {
-    const signupURL = '/api/v1/user/signup'
+    const signupURL = '/api/shayrad/v1/user/signup'
     const credential = {
-        firstName: "shayegan",
-        lastName: "amouei",
-        password: "Shy7200@",
-        nationalCode: "0022553975",
-        phone: "09384009969",
-        email: "shy@gmail.com"
+        "firstName": "Shayegan",
+        "lastName": "Amouei",
+        "password": "Shy7200@",
+        "nationalCode": "0022553975",
+        "phone": "09384009969",
+        "email": "shay@gmail.com"
     }
 
     it('signup user with wrong METHOD', async () => {
-        const response = await request(app).get(signupURL);
+        const response = await request(app).delete(signupURL);
 
         expect(response.body.status).toBe('fail');
         expect(response.status).toBe(404);
@@ -32,7 +31,7 @@ describe('user signup', () => {
 
         expect(response.status).toBe(400);
         expect(response.body.status).toBe('fail');
-        expect(response.body.code).toBe(1102)
+        expect(response.body.code).toBe(1103)
 
     })
 
@@ -47,7 +46,7 @@ describe('user signup', () => {
         });
         expect(response.status).toBe(400);
         expect(response.body.status).toBe('fail');
-        expect(response.body.code).toBe(1102)
+        expect(response.body.code).toBe(1103)
 
     })
 
@@ -63,7 +62,7 @@ describe('user signup', () => {
         });
         expect(response.status).toBe(400);
         expect(response.body.status).toBe('fail');
-        expect(response.body.code).toBe(1102)
+        expect(response.body.code).toBe(1103)
 
     })
 
@@ -81,8 +80,8 @@ describe('user signup', () => {
             test2: "test2"
         });
 
-        expect(response.status).toBe(201)
-        expect(response.body.status).toBe('success');
+        expect(response.status).toBe(400)
+        expect(response.body.status).toBe('fail');
 
     })
 
@@ -135,7 +134,7 @@ describe('user signup', () => {
         process.env.JWT_EXPIRES_AT = processEnvTime;
         await sleep(5);
 
-        const tokenResponse = await request(app).get('/api/v1/user/hello').set('Cookie', [`jwt=${userResponse.body.token}`])
+        const tokenResponse = await request(app).get('/api/shayrad/v1/user/hello').set('Cookie', [`jwt=${userResponse.body.token}`])
 
         expect(tokenResponse.body.code).toBe(1202)
         expect(tokenResponse.body.status).toBe('fail')
@@ -168,7 +167,7 @@ describe('user signin', () => {
         password: 'Shy7200@'
     }
 
-    const signinURL = '/api/v1/user/signin'
+    const signinURL = '/api/shayrad/v1/user/signin'
 
     it('signin user with wrong METHOD', async () => {
         const response = await request(app).get(signinURL);
@@ -257,7 +256,7 @@ describe('user signin', () => {
         process.env.JWT_EXPIRES_AT = processEnvTime;
         await sleep(5);
 
-        const tokenResponse = await request(app).get('/api/v1/user/hello').set('Cookie', [`jwt=${userResponse.body.token}`])
+        const tokenResponse = await request(app).get('/api/shayrad/v1/user/hello').set('Cookie', [`jwt=${userResponse.body.token}`])
 
         expect(tokenResponse.body.code).toBe(1202)
         expect(tokenResponse.body.status).toBe('fail')

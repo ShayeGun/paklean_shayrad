@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { catchAsync } from "../utils/catch-async";
 import { signup, signin, validateUser } from "../controllers/user-auth";
-import { preRegisterUser, registerUser } from "../controllers/user-register";
+import { preRegisterUser, registerUser, getLicenses } from "../controllers/user-license";
 
 const router = Router();
 
@@ -11,16 +11,16 @@ router.route('/signup')
 router.route('/signin')
     .post(signin)
 
-router.use(validateUser)
-
 router.route('/pre-register')
-    .post(preRegisterUser)
+    .post(validateUser, preRegisterUser)
 
 router.route('/register')
-    .post(registerUser)
+    .post(validateUser, registerUser)
+
+router.route('/user-license').get(validateUser, getLicenses)
 
 router.route('/hello')
-    .get(async (req, res) => {
+    .get(validateUser, async (req, res) => {
 
         res.status(200).send(req.user)
 

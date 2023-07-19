@@ -43,7 +43,7 @@ class Token {
 
         this.createdAt = Date.now();
 
-        this.accessToken = data.accessToken
+        this.accessToken = data.access_token
         // convert seconds milliseconds
         this.expiresIn = data.expires_in * 1000
         this.tokenType = data.token_type

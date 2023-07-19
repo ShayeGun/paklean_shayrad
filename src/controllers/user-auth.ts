@@ -4,10 +4,14 @@ import { User } from '../models/user'
 import { createSendToken, verifyJWT } from '../utils/jwt-handler'
 import { CustomError } from '../utils/custom-error'
 import { catchAsync } from '../utils/catch-async'
+import { userSignupValidator } from '../utils/validator-checker/user-signup-validator'
 
 env.config({ path: `${__dirname}/../../.env` })
 
 const signup = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    // validation of user input
+    await userSignupValidator.validateAsync(req.body);
+
     const user = new User(req.body);
     await user.save()
 

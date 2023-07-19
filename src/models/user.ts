@@ -1,4 +1,4 @@
-import { Model, model, Schema } from 'mongoose';
+import mongoose, { Model, model, mongo, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 
@@ -16,6 +16,7 @@ interface IUser {
     phone: string;
     email: string;
     role: Roles;
+    drivingLicense?: mongoose.Schema.Types.ObjectId[]
 }
 
 interface IUserMethods {
@@ -61,7 +62,10 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
         type: String,
         enum: Roles,
         default: Roles.user
-    }
+    },
+    drivingLicense: [{
+        type: mongoose.Schema.Types.ObjectId, ref: 'License'
+    }]
 });
 
 userSchema.method('correctPassword', async function correctPassword(userPass) {

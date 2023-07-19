@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node ./src/server.ts",
     "test": "jest --watchAll --no-cache ./tests",
-    "else": "ts-node .src/utils/signfile.ts",
+    "else": "ts-node ./src/controller/populate.ts",
     "dev": "ts-node-dev --files --clear ./src/server.ts"
   },
   "jest": {
@@ -30,6 +30,7 @@
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^6.7.1",
     "helmet": "^7.0.0",
+    "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.1",
     "mongodb-memory-server": "^8.13.0",
     "mongoose": "^7.3.2",
