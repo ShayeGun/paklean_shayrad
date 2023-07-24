@@ -7,12 +7,13 @@ const sendError = (err: CustomError | Error, res: Response) => {
         res.json(err.errInfo());
     }
     else {
-        console.log(Object.keys(err));
-        console.log(err.name);
-        console.log((err as any).code);
-        console.log((err as any).message);
-        console.log((err as any).cause);
+        // unwanted data
+        delete (err as any).request;
+        delete (err as any).response;
+        delete (err as any).config;
 
+        console.log(Object.keys(err));
+        console.log(err);
 
         res.status(500).send('oh oh sth bad happened 😓')
 
@@ -48,7 +49,6 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     if (err.code === 11000) {
         error = handleDuplicateFieldDB();
     }
-
 
     if (error.name === 'ValidationError') {
         error = handleValidation(err);

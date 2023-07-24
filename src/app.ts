@@ -2,17 +2,18 @@ import express from 'express';
 import cookieParser from "cookie-parser";
 import helmet from 'helmet';
 import cors from 'cors';
-import rateLimit from 'express-rate-limit'
+import rateLimit from 'express-rate-limit';
+import logger from 'morgan';
 import ExpressMongoSanitize from 'express-mongo-sanitize';
 import { userRoute } from './routes/user-router';
 import { errorHandler } from './controllers/error-handler';
 import { CustomError } from './utils/custom-error';
-import { Token, token } from './utils/token';
-import { catchAsync } from './utils/catch-async';
+import { token } from './utils/token';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser());
+app.use(logger('dev'));
 
 // =========== SECURITY ===========
 const limiter = rateLimit({
@@ -47,10 +48,10 @@ app.get('/api/shayrad/v1/get-token', async (req, res, next) => {
 // FIX: for development only
 app.use((req, res, next) => {
     req.token = {
-        "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2ODk3NjgzNDIsImV4cCI6MTY4OTc3MTk0MiwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY4OTc2ODM0Miwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.AXZN4qmNXyszQSW7fvfyZvl7RuxoAh8C2IT51lCP8xBQxhrYMpcyWOYkNdFdDO_lIf5dO7RIsMLzlYDEolFadNRXeZwdFRTq-ttuXl_mz_JlAeeSoxdlPmB4ogs2oEvXBuZG4f06k7SOvqsGI-nCSnp45VYjunyW6SzA7MOH5A8GQ2aTfWTxg0mBXL2MwZcVIhvsCY-nvMHXNV9zsQZxKSj04iSUODq_T7fKiXAnzYw3oSpZALl249LhAvNaRlA1t2lVEeeBiDwao_tr9VON-rby2ghW9lGjkO3d0Fprp4YY6DmTQSOlwGPbZ6LyiCkiVtsy-pPFM7wb-dSv1qeVTQ",
+        "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTAyMTE1ODIsImV4cCI6MTY5MDIxNTE4MiwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MDIxMTU4Miwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.sVBrDguOf1Kby_0QMmouxgjW_eX8Tr7UbD9iNrFqL-TteBBf5xntrGSP63vbvivohz1XLKa_uaTIGHGovylxlT2wf8TYOCo30Y_H_PBiJAjtOwKmjxyYp0rMWoM6qm1qiZbg9nmIxlPA10k42r9WDIwy49xEtqPy5zridPps7wI9PX5QWrJDLF6V9wEbgu6xWe-W3mDn0X5UF3I7K18t_TGYqO3yyDiq8LlLlOjDjCGCsvoPB1CugpsjdNmvh3lAH2VuOaC0RLVi-xh6jfKKc6FYs08J3EjvQPTvivU4Mz19VcR51ipNZI5cWalg8gHcAuXFXwGrN_VwSzDJtWZbww",
         "tokenType": "Bearer",
         "scope": "naji_api_scope",
-        "createdAt": 1689768326533,
+        "createdAt": 1690211560857,
         "expiresIn": 3600000
     }
     next()

@@ -1,23 +1,17 @@
 import { Router } from "express";
-import { catchAsync } from "../utils/catch-async";
-import { signup, signin, validateUser } from "../controllers/user-auth";
-import { preRegisterUser, registerUser, getLicenses } from "../controllers/user-license";
+import { validateUser } from "../controllers/user-auth";
+import { registerUser } from "../controllers/user-license";
+import { userSignupValidator } from "../utils/validator-checker/user-signup-validator";
 
 const router = Router();
 
-router.route('/signup')
-    .post(signup)
-
-router.route('/signin')
-    .post(signin)
-
-router.route('/pre-register')
-    .post(validateUser, preRegisterUser)
+// router.route('signup')
+// .post()
 
 router.route('/register')
     .post(validateUser, registerUser)
 
-router.route('/user-license').get(validateUser, getLicenses)
+// router.route('/user-license').get(validateUser, getLicenses)
 
 router.route('/hello')
     .get(validateUser, async (req, res) => {
