@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { ApiRequest, Methods } from "./api-request";
+import { Token } from '../token';
 
 interface IPostRequest {
     method: Methods.post,
@@ -13,14 +14,18 @@ class PostRequest extends ApiRequest<IPostRequest> {
 
     method: IPostRequest["method"] = Methods.post
     url: IPostRequest['url']
-    headers: IPostRequest['headers'] = {}
-    private params?: IPostRequest['params']
-    private data: IPostRequest['data'] = {}
+    headers: IPostRequest['headers'];
+    private params?: IPostRequest['params'];
+    private data: IPostRequest['data'] = {};
 
-    constructor(url: IPostRequest['url'] = 'https://postman-echo.com/post', params?: IPostRequest['params']) {
+    constructor(url: IPostRequest['url'] = 'https://postman-echo.com/post', token: Token, params?: IPostRequest['params']) {
         super();
         this.url = url
-        if (params) this.params = params
+        this.params = params ? params : {};
+
+        // default headers
+        const t = token.getToken();
+        this.headers = { "Authorization": `${t.tokenType} ${t.accessToken}`, "Content-Type": "application/json" }
     }
 
     setBody(data: IPostRequest['data']) {

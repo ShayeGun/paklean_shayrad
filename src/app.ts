@@ -48,11 +48,16 @@ app.get('/api/shayrad/v1/get-token', async (req, res, next) => {
 // FIX: for development only
 app.use((req, res, next) => {
     req.token = {
-        "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTAyODQ2NzEsImV4cCI6MTY5MDI4ODI3MSwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MDI4NDY3MSwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.RNJO0LSpCmp3_q-w4KwQifsWGiwfAwssfMiHZlEIiJlyYTAmFUF2szXy2hEc_emB7DjiRcriTKwHEfKlLF8yPvs17x6tv5kv9xjiLmAt9RgQAuKpuAzrVzb_ac4CIcqruhg0QPFPJjEdIoNzMA83Fwk5g0dty1bc6Pak-o-u3ZcYbyTRYrQ2eBq5-SJ6I9bVhjbaPpS-I-Gg9QRWad8AIXKjin8hA-0x1mj9scJeYTZzMJl6vYEINQT2YWkEMVrT_tcHK1DEFJiXJoyE50ihrHiuPWSi1gofvsTcO5VuD9rYeKiYXRTZmdnOgdkz5m-goIaiOiS8duvgWej2RL3vGg",
-        "tokenType": "Bearer",
-        "scope": "naji_api_scope",
-        "createdAt": 1690284649391,
-        "expiresIn": 3600000
+        getToken() {
+            return {
+                "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTAyOTI5NDAsImV4cCI6MTY5MDI5NjU0MCwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MDI5Mjk0MCwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.sieKOVj7SzHRvD5EXW1JiBGAxSplf83LmzEw1tpji6HWxvj1JiLTe_1qVp8rPRiW8CIM7EEuqFTwG6QurNx-gU2C4LbpfCaFQCjodrt2NWk808020-raGEWVzvsVxHG1lwUS15SFMhN_KLQ2qaX3XLSodHlk34O90YShv7m1tcAA_r-fltp6ZYLC_zfJMe_7CgxBDicX7ls2P1HTR07uSHR_Ex8y_eqIeNo2gYz-bfM6r7BA5yrnlEobJ4BXJP7TMEkAypOTEfT52k6EkHfhKqDjJbWg_8cGSxR96AFr3M5SgXMcxF0fE4xFD0yrdM8GU-EaUuRkxQ9du9JNcm4dCQ",
+                "tokenType": "Bearer",
+                "scope": "naji_api_scope",
+                "createdAt": 1690292918653,
+                "expiresIn": 3600000
+            }
+        }
+
     }
     next()
 })

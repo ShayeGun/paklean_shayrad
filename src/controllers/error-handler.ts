@@ -42,7 +42,11 @@ function handleTokenExpired() {
     return new CustomError('token expired Please login again!', 401, 1202);
 }
 
-const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+async function shayradUserIdExpired(err: any) {
+    return new CustomError('user\'s userId (authentication) expired', 400, 433)
+}
+
+const errorHandler: ErrorRequestHandler = async (err, req, res, next) => {
 
     let error: any = err;
 
@@ -60,6 +64,10 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 
     else if (error.name === 'TokenExpiredError') {
         error = handleTokenExpired();
+    }
+
+    else if (err.response.status === 500 && err.response.data.Message === '127:unhandled exception please call admin') {
+        error = await shayradUserIdExpired(err);
     }
 
     sendError(error, res)

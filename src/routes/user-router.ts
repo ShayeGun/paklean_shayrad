@@ -1,12 +1,10 @@
 import { Router } from "express";
-import { validateUser } from "../controllers/user-auth";
-
+import { validateUser } from "../controllers/auth-controller";
+import { getDrivingLicenses } from "../controllers/license-controller";
 const router = Router();
 
-router.route('/register')
-    .post(validateUser, (req, res, next) => {
-        res.status(200).send('ok')
-    })
+router.route('/licenses')
+    .post(validateUser, getDrivingLicenses)
 
 // router.route('/user-license').get(validateUser, getLicenses)
 

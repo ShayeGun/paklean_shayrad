@@ -11,9 +11,9 @@ const preRegisterUser = async (req: Request, res: Response, next: NextFunction) 
     try {
         const { mobile, nationalCode } = req.body
 
-        const request = new PostRequest(`${process.env.SERVER_ADDRESS}/naji/users/initial-register`);
+        const request = new PostRequest(`${process.env.SERVER_ADDRESS}/naji/users/initial-register`, req.token);
 
-        request.setHeader({ "Authorization": `${req.token.tokenType} ${req.token.accessToken}`, "Content-Type": "application/json" }).setBody({
+        request.setBody({
             nationalCode,
             mobile
         })
@@ -41,9 +41,9 @@ const registerUser = async (req: Request, res: Response, next: NextFunction) => 
     try {
         const { mobile, nationalCode, otp } = req.body
 
-        const request = new PostRequest(`${process.env.SERVER_ADDRESS}/naji/users`);
+        const request = new PostRequest(`${process.env.SERVER_ADDRESS}/naji/users`, req.token);
 
-        request.setHeader({ "Authorization": `${req.token.tokenType} ${req.token.accessToken}`, "Content-Type": "application/json" }).setBody({
+        request.setBody({
             nationalCode,
             mobile,
             otp
@@ -127,6 +127,8 @@ const validateUser = catchAsync(async (req: Request, res: Response, next: NextFu
 
         return next(response);
     }
+
+    req.user = user!;
     next();
 })
 

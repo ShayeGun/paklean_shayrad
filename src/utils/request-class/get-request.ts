@@ -13,13 +13,17 @@ class GetRequest extends ApiRequest<IGetRequest> {
 
     method: IGetRequest["method"] = Methods.get
     url: IGetRequest['url']
-    declare headers: IGetRequest['headers']
+    headers: IGetRequest['headers']
     private params?: IGetRequest['params']
 
-    constructor(url: IGetRequest['url'] = 'https://postman-echo.com/status/200', params?: IGetRequest['params']) {
+    constructor(url: IGetRequest['url'] = 'https://postman-echo.com/status/200', token: Token, params?: IGetRequest['params']) {
         super();
         this.url = url
-        if (params) this.params = params
+        this.params = params ? params : {};
+
+        // default headers
+        const t = token.getToken();
+        this.headers = { "Authorization": `${t.tokenType} ${t.accessToken}` }
     }
 
     setHeader(header: IGetRequest['headers']) {
