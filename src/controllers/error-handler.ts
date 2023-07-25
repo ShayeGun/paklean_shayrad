@@ -30,7 +30,7 @@ function handleValidation(err: any) {
         return new CustomError(`${err._message}: ${Object.keys(err.errors)}`, 400, 1102)
 
     // joi validation error (server-side)
-    if (typeof (err._original) === 'object')
+    else if (typeof (err._original) === 'object')
         return new CustomError(err.message, 400, 1103)
 }
 
@@ -50,15 +50,15 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
         error = handleDuplicateFieldDB();
     }
 
-    if (error.name === 'ValidationError') {
+    else if (error.name === 'ValidationError') {
         error = handleValidation(err);
     }
 
-    if (error.name === 'JsonWebTokenError') {
+    else if (error.name === 'JsonWebTokenError') {
         error = handleJWTError();
     }
 
-    if (error.name === 'TokenExpiredError') {
+    else if (error.name === 'TokenExpiredError') {
         error = handleTokenExpired();
     }
 

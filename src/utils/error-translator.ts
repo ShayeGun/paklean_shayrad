@@ -1,17 +1,14 @@
 import { CustomError } from "./custom-error";
-import { NextFunction } from "express";
 
-
-export const errorTranslator = (err: any, errStatus: number, msg: string = 'error', resStatus: number = 400, next: NextFunction) => {
-    const validErrName = err.name === "AxiosError" ? true : false;
+export const errorTranslator = (err: any, conditionsArr: { errStatus: number, msg: string, resStatus: number }[]) => {
+    if (err.name !== "AxiosError") return err;
 
     const e = err.message.split(" ");
     const status = Number(e[e.length - 1]);
 
-    const validErrStatus = status === errStatus ? true : false;
+    for (let condition of conditionsArr) {
+        if (status === condition.errStatus) return new CustomError(condition.msg, condition.errStatus, condition.resStatus);
+    }
 
-    if (validErrName && validErrStatus)
-        return next(new CustomError(msg, errStatus, resStatus));
-
-    return
-} 
+    return err;
+}
