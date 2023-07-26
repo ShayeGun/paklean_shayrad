@@ -90,7 +90,6 @@ export const getLicensePlates = catchAsync(async (req: Request, res: Response, n
 
     const plates = await request.call();
 
-    let plateArr: Record<string, any>[] = [];
 
     for (let plate of plates) {
 
@@ -106,18 +105,14 @@ export const getLicensePlates = catchAsync(async (req: Request, res: Response, n
                 licensePlateNumber: plate.licensePlateNumber
             })
         }
-        existedPlate = await Plate.findOne({
-            licensePlateNumber: plate.licensePlateNumber
-        })
 
         // if the plate isn't already existed in DB -> add new plate
         if (!existedPlate?.nationalCode) {
             const newPlate = new Plate(plate);
             newPlate.nationalCode = req.user!.nationalCode;
             await newPlate.save();
-            plateArr.push(newPlate);
         }
     }
 
-    res.status(200).send(plateArr);
+    res.status(200).send(plates);
 })
