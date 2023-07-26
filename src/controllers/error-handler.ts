@@ -1,5 +1,6 @@
 import { CustomError } from "../utils/custom-error"
 import { ErrorRequestHandler, Response } from "express"
+import { errorTranslator } from "../utils/error-translator";
 
 const sendError = (err: CustomError | Error, res: Response) => {
     if (err instanceof CustomError && err.errInfo().status === 'fail') {
@@ -13,7 +14,9 @@ const sendError = (err: CustomError | Error, res: Response) => {
         delete (err as any).config;
 
         console.log(Object.keys(err));
-        console.log(err);
+        for (const [k, v] of Object.entries(err)) {
+            console.log(`${k} ===> ${v}`);
+        }
 
         res.status(500).send('oh oh sth bad happened 😓')
 
@@ -55,7 +58,7 @@ const errorHandler: ErrorRequestHandler = async (err, req, res, next) => {
     }
 
     else if (error.name === 'ValidationError') {
-        error = handleValidation(err);
+        error = handleValidation(error);
     }
 
     else if (error.name === 'JsonWebTokenError') {
@@ -66,8 +69,21 @@ const errorHandler: ErrorRequestHandler = async (err, req, res, next) => {
         error = handleTokenExpired();
     }
 
-    else if (err.response.status === 500 && err.response.data.Message === '127:unhandled exception please call admin') {
-        error = await shayradUserIdExpired(err);
+    else if (error.name === 'AxiosError') {
+        error = errorTranslator(error, [{
+            errStatus: 504,
+            resStatus: 411,
+            msg: "please try again"
+        },
+        {
+            errStatus: 401,
+            resStatus: 500,
+            msg: "please contact admins 😱"
+        }])
+    }
+
+    else if (err.response?.status === 500 && err.response.data?.Message === '127:unhandled exception please call admin') {
+        error = await shayradUserIdExpired(error);
     }
 
     sendError(error, res)

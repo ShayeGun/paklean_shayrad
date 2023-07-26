@@ -1,7 +1,7 @@
 import { Model, model, Schema } from 'mongoose';
-import validator from 'validator';
 
 interface ILicense {
+    nationalCode: string,
     title: string,
     rahvarStatus: string,
     barcode: string,
@@ -15,6 +15,7 @@ interface ILicenseMethods { }
 type LicenseModel = Model<ILicense, {}, ILicenseMethods>;
 
 const licenseSchema = new Schema<ILicense, LicenseModel, ILicenseMethods>({
+    nationalCode: String,
     title: String,
     rahvarStatus: String,
     barcode: String,
@@ -23,6 +24,11 @@ const licenseSchema = new Schema<ILicense, LicenseModel, ILicenseMethods>({
     validYears: String
 
 });
+
+// searches are based on national-code so it must be indexed
+licenseSchema.index({ nationalCode: 1 });
+// combination of barcode and title must be unique and it must not effect national-code cuz 1 person can have multiple licenses
+licenseSchema.index({ barcode: 1, title: 1 }, { unique: true });
 
 const License = model<ILicense, LicenseModel>('License', licenseSchema);
 

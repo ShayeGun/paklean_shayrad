@@ -7,7 +7,7 @@ export const errorTranslator = (err: any, conditionsArr: { errStatus: number, ms
     const status = Number(e[e.length - 1]);
 
     for (let condition of conditionsArr) {
-        if (status === condition.errStatus) return new CustomError(condition.msg, condition.errStatus, condition.resStatus);
+        if (status === condition.errStatus) return new CustomError(condition.msg, condition.resStatus, condition.resStatus);
     }
 
     return err;

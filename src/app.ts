@@ -50,10 +50,10 @@ app.use((req, res, next) => {
     req.token = {
         getToken() {
             return {
-                "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTAyOTI5NDAsImV4cCI6MTY5MDI5NjU0MCwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MDI5Mjk0MCwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.sieKOVj7SzHRvD5EXW1JiBGAxSplf83LmzEw1tpji6HWxvj1JiLTe_1qVp8rPRiW8CIM7EEuqFTwG6QurNx-gU2C4LbpfCaFQCjodrt2NWk808020-raGEWVzvsVxHG1lwUS15SFMhN_KLQ2qaX3XLSodHlk34O90YShv7m1tcAA_r-fltp6ZYLC_zfJMe_7CgxBDicX7ls2P1HTR07uSHR_Ex8y_eqIeNo2gYz-bfM6r7BA5yrnlEobJ4BXJP7TMEkAypOTEfT52k6EkHfhKqDjJbWg_8cGSxR96AFr3M5SgXMcxF0fE4xFD0yrdM8GU-EaUuRkxQ9du9JNcm4dCQ",
+                "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTAzODAzNDEsImV4cCI6MTY5MDM4Mzk0MSwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MDM4MDM0MSwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.d0BFYWM-4n4ESMwrvaQfvGlhE8ETWZXmImhFhXnly5FPoonGOorqNF2hGwAUeFETvsFanKIYJfa4nSV07XdRM9WPersYMiA1pmVlutoEvkIVUsH3WAHaV3roPeTznsWh58iIgZxV2kZFTAW9sAIBRTTRjsbI4IhuNpToMz4vavpOdx45kQvTuCruql4dnLR54T6ZDRaoREyRr0YqkW6yXsH3ZR--O4jcbjJdxJ3YTId4RHCpTqUBO8JL4i23SbNc2hEjjq7Om3nkyaT2OKZDoD3ZirQ14eVHxJMim9JaTePWzz-Qbj5BkkGqVyW2xBiptV1oUzGCZlSoPdaFeWxQ-w",
                 "tokenType": "Bearer",
                 "scope": "naji_api_scope",
-                "createdAt": 1690292918653,
+                "createdAt": 1690380319390,
                 "expiresIn": 3600000
             }
         }
@@ -72,7 +72,8 @@ app.route('/api/shayrad/v1/hello')
 app.use('/api/shayrad/v1/user', userRoute);
 
 app.use('*', (req, res, next) => {
-    next(new CustomError('No Such URL Sry 🥲', 404, 404))
+    return next(new CustomError('No Such URL Sry 🥲', 404, 404))
+
 })
 
 app.use(errorHandler)
