@@ -149,7 +149,7 @@ export const getViolationReport = catchAsync(async (req: Request, res: Response,
     if (!licensePlate) return next(new CustomError('you must proved a license plate', 400, 436));
 
     const existedPlate = await Plate.findOne({ licensePlateNumber: licensePlate });
-    if (!existedPlate?.licensePlateNumber) return next(new CustomError('user doesn\'t own a license plate', 400, 437));
+    if (!existedPlate?.licensePlateNumber) return next(new CustomError('user doesn\'t own license plate', 400, 437));
 
     const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${existedPlate.licensePlateNumber}/violations/report`, req.token);
     const violations = await request.call();
@@ -224,4 +224,28 @@ export const getViolationImage = catchAsync(async (req: Request, res: Response, 
     }
 
     res.status(200).send(image);
+});
+
+
+export const getPlateDoc = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+    const licensePlate = req.body.licensePlate ? req.body.licensePlate : '';
+    if (!licensePlate) return next(new CustomError('you must proved a license plate', 400, 436));
+
+    const existedPlate = await Plate.findOne({ licensePlateNumber: licensePlate });
+    if (!existedPlate?.licensePlateNumber) return next(new CustomError('user doesn\'t own license plate', 400, 437));
+
+    const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${existedPlate.licensePlateNumber}/documents/status`, req.token);
+
+    const status = await request.call();
+
+    for (let [k, v] of Object.entries(status)) {
+        // plateChar is already saved
+        if (k === 'plateChar') continue;
+        if ((existedPlate as any)[k] !== v) (existedPlate as any)[k] = v
+    }
+
+    if (existedPlate.isModified()) await existedPlate.save();
+
+    res.status(200).send(status);
 });

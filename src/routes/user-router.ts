@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { validateUser } from "../controllers/auth-controller";
-import { getDrivingLicenses, getNegativePoints, getLicensePlates, getViolationReport, getViolationImage } from "../controllers/license-controller";
+import { getDrivingLicenses, getNegativePoints, getLicensePlates, getViolationReport, getViolationImage, getPlateDoc } from "../controllers/license-controller";
 import { User } from "../models/user";
 import { getPassport, leaveCountry } from "../controllers/passport";
 
@@ -20,6 +20,9 @@ router.route('/license-plates/violations/report')
 
 router.route('/license-plates/violations/image')
     .post(validateUser, getViolationImage);
+
+router.route('/license-plates/document')
+    .post(validateUser, getPlateDoc);
 
 router.route('/passport')
     .post(validateUser, getPassport);
