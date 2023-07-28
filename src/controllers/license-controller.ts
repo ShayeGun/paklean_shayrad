@@ -212,8 +212,6 @@ export const getViolationImage = catchAsync(async (req: Request, res: Response, 
 
     if (existedPlate?.vehicleViolations.length === 0) return next(new CustomError('this violation id doesn\'t belong to this license plate', 400, 440));
 
-
-
     const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${existedPlate!.licensePlateNumber}/violations/${(existedPlate?.vehicleViolations[0] as any).violationId}/image`, req.token);
 
     const image = await request.call();

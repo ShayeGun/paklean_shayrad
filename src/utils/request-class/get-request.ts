@@ -1,6 +1,7 @@
 import { ApiRequest, Methods } from "./api-request";
 import axios from "axios";
 import { Token } from "../token"
+import { generateUniqueNumber } from "../generate-unique-number";
 
 interface IGetRequest {
     method: Methods.get,
@@ -33,6 +34,8 @@ class GetRequest extends ApiRequest<IGetRequest> {
     }
 
     async call(): Promise<any> {
+        this.setHeader({ activityId: generateUniqueNumber() });
+
         let requestConfig: IGetRequest = {
             url: this.url,
             method: this.method,

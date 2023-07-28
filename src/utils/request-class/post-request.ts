@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { ApiRequest, Methods } from "./api-request";
 import { Token } from '../token';
+import { generateUniqueNumber } from "../generate-unique-number";
 
 interface IPostRequest {
     method: Methods.post,
@@ -41,6 +42,8 @@ class PostRequest extends ApiRequest<IPostRequest> {
     }
 
     async call(): Promise<any> {
+        this.setHeader({ activityId: generateUniqueNumber() });
+
         let requestConfig: IPostRequest = {
             url: this.url,
             method: this.method,
