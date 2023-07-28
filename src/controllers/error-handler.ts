@@ -3,7 +3,7 @@ import { ErrorRequestHandler, Response } from "express"
 import { errorTranslator } from "../utils/error-translator";
 
 const sendError = (err: CustomError | Error, res: Response) => {
-    if (err instanceof CustomError && err.errInfo().status === 'fail') {
+    if (err instanceof CustomError) {
         res.status(err.errStatus());
         res.json(err.errInfo());
     }
@@ -17,6 +17,8 @@ const sendError = (err: CustomError | Error, res: Response) => {
         for (const [k, v] of Object.entries(err)) {
             console.log(`${k} ===> ${v}`);
         }
+        console.log(err.message);
+
 
         res.status(500).send('oh oh sth bad happened 😓')
 

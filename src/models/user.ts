@@ -7,13 +7,14 @@ enum Roles {
 }
 
 interface IUser {
-    firstName?: string;
-    lastName?: string;
+    firstName: string;
+    lastName: string;
     nationalCode: string;
     mobile: string;
-    userId?: string;
-    negativePoint?: string,
-    isDrivingAllowed?: boolean,
+    userId: string;
+    negativePoint: string,
+    isDrivingAllowed: boolean,
+    allowedToLeave: Boolean,
     role: Roles;
 }
 
@@ -36,19 +37,22 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
         minlength: 11,
         validate: [validator.isMobilePhone, 'not valid phone number']
     },
-    userId: {
-        type: String
-    },
-    negativePoint: {
-        type: String
-    },
-    isDrivingAllowed: {
-        type: Boolean
-    },
+    userId: String,
+    negativePoint: String,
+    isDrivingAllowed: Boolean,
+    allowedToLeave: Boolean,
     role: {
         type: String,
         enum: Roles,
         default: Roles.user
+    }
+}, {
+    toJSON: {
+        // not show __v , _id 
+        transform(doc, ret) {
+            delete ret._id;
+            delete ret.__v;
+        }
     }
 });
 

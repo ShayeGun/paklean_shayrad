@@ -69,12 +69,13 @@ const registerUser = async (req: Request, res: Response, next: NextFunction) => 
         if (!existedUser) {
             const user = new User(userData);
             await user.save();
+            req.user = user;
         }
         // case 2 -> user already exists -> update userId
         else {
-            await User.findOneAndUpdate({
-                userId: response.userId
-            })
+            existedUser.userId = response.userId;
+            await existedUser.save();
+            req.user = existedUser;
         }
 
         return response
@@ -127,7 +128,7 @@ const validateUser = catchAsync(async (req: Request, res: Response, next: NextFu
 
         return next(response);
     }
-
+    // user already exist
     req.user = user!;
     next();
 })

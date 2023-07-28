@@ -23,6 +23,14 @@ const licenseSchema = new Schema<ILicense, LicenseModel, ILicenseMethods>({
     printDate: String,
     validYears: String
 
+}, {
+    toJSON: {
+        // not show __v , _id 
+        transform(doc, ret) {
+            delete ret._id;
+            delete ret.__v;
+        }
+    }
 });
 
 // searches are based on national-code so it must be indexed
