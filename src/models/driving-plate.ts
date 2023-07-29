@@ -1,5 +1,4 @@
 import { Model, model, Schema, Types } from 'mongoose';
-import { type } from 'os';
 
 function getVehicleType(plateNum: string) {
     if (plateNum.length === 9) return vehicle.car

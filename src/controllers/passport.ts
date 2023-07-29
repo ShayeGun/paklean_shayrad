@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { catchAsync } from "../utils/catch-async";
 import { GetRequest } from "../utils/request-class/get-request";
-import { PostRequest } from "../utils/request-class/post-request";
 import { Passport } from "../models/passport";
 
 export const getPassport = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -35,19 +34,4 @@ export const getPassport = catchAsync(async (req: Request, res: Response, next: 
     passport.nationalCode = req.user!.nationalCode;
 
     res.status(200).send(passport);
-})
-
-// BROKE: 
-export const leaveCountry = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/country-leaving-permission`, req.token);
-    const response = await request.call();
-
-    if (req.user!.allowedToLeave === undefined) {
-        console.log('=======================');
-
-        req.user!.allowedToLeave = response.status
-        await req.user!.save();
-    }
-
-    res.status(200).send(req.user);
 })

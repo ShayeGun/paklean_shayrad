@@ -1,4 +1,4 @@
-import mongoose, { Model, model, mongo, Schema } from 'mongoose';
+import { Model, model, Schema } from 'mongoose';
 import validator from 'validator';
 
 enum Roles {

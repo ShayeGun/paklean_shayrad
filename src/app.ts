@@ -9,6 +9,7 @@ import { userRoute } from './routes/user-router';
 import { errorHandler } from './controllers/error-handler';
 import { CustomError } from './utils/custom-error';
 import { token } from './utils/token';
+import { catchAsync } from './utils/catch-async';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }))
@@ -32,9 +33,13 @@ app.use('/api', limiter);
 
 // =========== END SECURITY ===========
 
+// // FIX: for production only
 // check validity of token with each request
 // app.use(catchAsync(async (req, res, next) => {
 //     await token.checkValidity()
+//     console.log(token.getToken());
+
+//     req.token = token;
 //     next()
 // }))
 
@@ -45,15 +50,14 @@ app.get('/api/shayrad/v1/get-token', async (req, res, next) => {
     res.json(token.getToken())
 })
 
-// FIX: for development only
 app.use((req, res, next) => {
     req.token = {
         getToken() {
             return {
-                "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTA1NjI0NDMsImV4cCI6MTY5MDU2NjA0MywiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MDU2MjQ0Mywic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.I1LgoZQZGc6oyEwYcs3TqNxxAqVDzUtMhizzCKB7gMoXlcuxLCqtk4pDp-6XqmSp17LBQ0CQg_NQslZ7lf7LU30Ld9xiYdsBSwnuu825HLB-qVQk5JSiv_fvWvb34PimptwtCgVZFId1JkMckXqi4MDyZTn9kwnw4dba7jJjoYXK2_phr-DhBTUyYagA44CgVXeCUse90iRPaorar50LM9hr7D4oYR9ZQFUEB2A8npxaAbKfiTH18BlU1KaroKa9g7BxUQ8pXWGZsan1QOeI4RZkWRgeHw7uV9vENE8-LHroNRpIcGFU-R4zfHPyI1zEPZg60SNRzThttfmN7CZSuA",
+                "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTA2MjY0MDgsImV4cCI6MTY5MDYzMDAwOCwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MDYyNjQwOCwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.p17djHbGL31-Aho0Wi3_Ugmw2M1qrIPyS1otB33ulX4CXHdSveqTW2-ebYx0buC4p5rQ5CsXtc8CmOtBxwPLi2pUOP3Gb2jaiIKqvPJRCyuTTTMvwZryEruymspYM4nRQLJ86jpfLu4VG5Rta4Qt3Ww-NR2rQLIRC-n9tbIeIuYINkBvLbA0BH8nlQtN2G4yv8yMXO8oflkrviDD84q8C_6bO0ksvX84NtrWQuJI3JA922JxDhf-YKNygnHBvXzmSC1bRnOCrcwMcwVeUfZSE-RQNZdOWCMDFPJ68iYZrYJVl-7_7Zvg1T2x35TP6RyZg3of_a8HO6z5J1MgsQnc6g",
                 "tokenType": "Bearer",
                 "scope": "naji_api_scope",
-                "createdAt": 1690562420791,
+                "createdAt": 1690626385199,
                 "expiresIn": 3600000
             }
         }

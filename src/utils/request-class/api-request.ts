@@ -1,4 +1,4 @@
-import { Token } from "../token"
+import { IToken } from "../token"
 
 enum Methods {
     post = 'post',
@@ -17,7 +17,7 @@ abstract class ApiRequest<T extends IRequest>{
     protected abstract url: T["url"]
     protected abstract headers: T["headers"]
 
-    abstract call(token: Token): Promise<any>
+    abstract call(token: IToken): Promise<any>
 }
 
 export { ApiRequest, Methods }

@@ -92,7 +92,7 @@ export const getNegativePoints = catchAsync(async (req: Request, res: Response, 
 
     const negPoint = await request.call();
 
-    if (!req.user!.negativePoint) {
+    if (req.user!.negativePoint !== negPoint.negativePoint) {
         req.user!.negativePoint = negPoint.negativePoint
         req.user!.isDrivingAllowed = negPoint.isDrivingAllowed
         await req.user!.save();
@@ -181,19 +181,10 @@ export const getViolationReport = catchAsync(async (req: Request, res: Response,
             existedPlate.totalViolationInfo[k] = v;
         }
 
-        // ERL/aggregate's response is similar to this end point but 2 additional fields "complaintsStatus" + "complaints" made 2 end points in one
-        const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${existedPlate.licensePlateNumber}/violations/aggregate`, req.token);
-        const aggregateViolations = await request.call();
-        existedPlate.totalViolationInfo["complaintStatus"] = aggregateViolations.complaintStatus;
-        existedPlate.totalViolationInfo["complaint"] = aggregateViolations.complaint;
-
         // for some who knows reasons mongoose only updates existedPlate.totalViolationInfo if we say to it manually that totalViolationInfo field have been changed so updated |-_-|
         existedPlate.markModified('totalViolationInfo');
         await existedPlate.save();
     }
-
-    violations.complaintStatus = existedPlate.totalViolationInfo["complaintStatus"];
-    violations.complaint = existedPlate.totalViolationInfo["complaint"];
 
     res.status(200).send(violations);
 });
@@ -225,6 +216,31 @@ export const getViolationImage = catchAsync(async (req: Request, res: Response, 
 
     res.status(200).send(image);
 });
+
+export const getViolationAggregate = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const licensePlate = req.body.licensePlate ? req.body.licensePlate : '';
+    if (!licensePlate) return next(new CustomError('you must proved a license plate', 400, 436));
+
+    const existedPlate = await Plate.findOne({ licensePlateNumber: licensePlate });
+    if (!existedPlate?.licensePlateNumber) return next(new CustomError('user doesn\'t own license plate', 400, 437));
+
+    const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${existedPlate.licensePlateNumber}/violations/aggregate`, req.token);
+    const aggregateViolations = await request.call();
+
+    if (aggregateViolations.paymentId !== existedPlate.totalViolationInfo.paymentId || aggregateViolations.complaint !== existedPlate.totalViolationInfo.complaint) {
+        for (let [k, v] of Object.entries(aggregateViolations)) {
+            // plateChar is already saved
+            if (k === 'plateChar') continue;
+            // price is number for consistency cas it to string
+            if (existedPlate.totalViolationInfo[k] !== v) existedPlate.totalViolationInfo[k] = `${v}`
+        }
+        // for some who knows reasons mongoose only updates existedPlate.totalViolationInfo if we say to it manually that totalViolationInfo field have been changed so updated |-_-|
+        existedPlate.markModified('totalViolationInfo');
+        existedPlate.save();
+    }
+
+    res.status(200).send(aggregateViolations);
+})
 
 
 export const getPlateDoc = catchAsync(async (req: Request, res: Response, next: NextFunction) => {

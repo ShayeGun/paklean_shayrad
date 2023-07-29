@@ -13,7 +13,6 @@ interface IViolation {
     hasImage: boolean,
     plateImage: string,
     vehicleImage: string,
-    status: boolean
 }
 
 interface IViolationMethods { }
@@ -32,12 +31,7 @@ const violationSchema = new Schema<IViolation, ViolationModel, IViolationMethods
     paymentId: String,
     hasImage: Boolean,
     plateImage: String,
-    vehicleImage: String,
-    status: {
-        type: Boolean,
-        default: true
-    }
-
+    vehicleImage: String
 }, {
     toJSON: {
         // not show __v , _id 

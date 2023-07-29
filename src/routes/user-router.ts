@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { validateUser } from "../controllers/auth-controller";
-import { getDrivingLicenses, getNegativePoints, getLicensePlates, getViolationReport, getViolationImage, getPlateDoc } from "../controllers/license-controller";
+import { getDrivingLicenses, getNegativePoints, getLicensePlates, getViolationReport, getViolationImage, getViolationAggregate, getPlateDoc } from "../controllers/license-controller";
 import { User } from "../models/user";
-import { getPassport, leaveCountry } from "../controllers/passport";
+import { getPassport } from "../controllers/passport";
 
 const router = Router();
 
@@ -21,15 +21,14 @@ router.route('/license-plates/violations/report')
 router.route('/license-plates/violations/image')
     .post(validateUser, getViolationImage);
 
+router.route('/license-plates/violations/aggregate')
+    .post(validateUser, getViolationAggregate);
+
 router.route('/license-plates/document')
     .post(validateUser, getPlateDoc);
 
 router.route('/passport')
     .post(validateUser, getPassport);
-
-// BROKE: 
-// router.route('/leave-country')
-//     .post(validateUser, leaveCountry);
 
 // FIX: for test only
 router.route('/test').get(async (req, res, next) => {

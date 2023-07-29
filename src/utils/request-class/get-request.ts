@@ -1,6 +1,6 @@
 import { ApiRequest, Methods } from "./api-request";
 import axios from "axios";
-import { Token } from "../token"
+import { IToken } from "../token"
 import { generateUniqueNumber } from "../generate-unique-number";
 
 interface IGetRequest {
@@ -17,7 +17,7 @@ class GetRequest extends ApiRequest<IGetRequest> {
     headers: IGetRequest['headers']
     private params?: IGetRequest['params']
 
-    constructor(url: IGetRequest['url'] = 'https://postman-echo.com/status/200', token: Token, params?: IGetRequest['params']) {
+    constructor(url: IGetRequest['url'] = 'https://postman-echo.com/status/200', token: IToken, params?: IGetRequest['params']) {
         super();
         this.url = url
         this.params = params ? params : {};

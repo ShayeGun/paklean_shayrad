@@ -9,6 +9,10 @@ interface IToken {
     expiresIn: number;
     tokenType: string;
     scope: string;
+    build(): Token;
+    login(): Promise<Token>;
+    checkValidity(): Promise<Token>;
+    getToken(): any;
 }
 
 class Token {
@@ -72,4 +76,4 @@ class Token {
 
 const token = Token.build();
 
-export { token, Token }
+export { token, IToken }

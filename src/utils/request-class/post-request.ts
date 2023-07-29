@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ApiRequest, Methods } from "./api-request";
-import { Token } from '../token';
+import { IToken } from '../token';
 import { generateUniqueNumber } from "../generate-unique-number";
 
 interface IPostRequest {
@@ -19,7 +19,7 @@ class PostRequest extends ApiRequest<IPostRequest> {
     private params?: IPostRequest['params'];
     private data: IPostRequest['data'] = {};
 
-    constructor(url: IPostRequest['url'] = 'https://postman-echo.com/post', token: Token, params?: IPostRequest['params']) {
+    constructor(url: IPostRequest['url'] = 'https://postman-echo.com/post', token: IToken, params?: IPostRequest['params']) {
         super();
         this.url = url
         this.params = params ? params : {};

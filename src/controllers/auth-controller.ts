@@ -3,7 +3,6 @@ import { CustomError } from '../utils/custom-error'
 import { catchAsync } from '../utils/catch-async'
 import { errorTranslator } from "../utils/error-translator";
 import { PostRequest } from "../utils/request-class/post-request";
-import { GetRequest } from '../utils/request-class/get-request'
 import { userSignupValidator } from '../utils/validator-checker/user-signup-validator'
 import { User } from '../models/user'
 
