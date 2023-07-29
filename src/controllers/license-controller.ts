@@ -7,6 +7,7 @@ import { Plate } from "../models/driving-plate";
 import { CustomError } from "../utils/custom-error";
 import { Violation } from "../models/plate-violations";
 import mongoose from "mongoose";
+import Joi from "joi";
 
 
 export const getDrivingLicenses = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -241,6 +242,23 @@ export const getViolationAggregate = catchAsync(async (req: Request, res: Respon
 
     res.status(200).send(aggregateViolations);
 })
+
+export const getViolationNoAuth = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+    const licensePlate = req.body.licensePlate ? req.body.licensePlate : '';
+    if (!licensePlate) return next(new CustomError('you must proved a license plate', 400, 436));
+
+    const plateSchema = Joi.object({
+        licensePlate: Joi.string().pattern(new RegExp(/^[0-9]+$/)).message('plate must only contain numbers')
+    })
+    await plateSchema.validateAsync({ licensePlate });
+
+    const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/vehicles/${licensePlate}/violations/aggregate?nationalCode=${req.user!.nationalCode}&cellphone=${req.user!.mobile}`, req.token);
+
+    const violations = await request.call();
+
+    res.status(200).send(violations);
+});
 
 
 export const getPlateDoc = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
