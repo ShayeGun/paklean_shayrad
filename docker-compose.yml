@@ -6,7 +6,11 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - dbdata6:/data/db
+      - dbdata7:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=shayrad
+      - MONGO_INITDB_ROOT_PASSWORD=paklean1392
+      - MONGO_INITDB_DATABASE=shayrad_police
 
   node-app:
     build: .
@@ -18,6 +22,7 @@ services:
       - mongodb
     volumes:
       - .:/usr/src/app
+      - /usr/src/app/node_modules
 
 volumes:
-  dbdata6:
+  dbdata7:
