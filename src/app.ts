@@ -58,10 +58,10 @@ app.use((req, res, next) => {
     req.token = {
         getToken() {
             return {
-                "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTA3OTgzODMsImV4cCI6MTY5MDgwMTk4MywiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MDc5ODM4Mywic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.IKWpyuQZK_VSGCmfkrW_dgoGt2by8ZHs6hpQ3oEEPatoTDSy3SsbNCFrpJqrIr34zoBhMqQmFBjWsmusjRSUq5ry3fzBD7ZyBAdZ2RuRoyGv8DdqwbFpmPG2idjJ28b1gln37hxuYdKNtp6yfjDRVrA9fFxtmE3TvcSVitf2pRSjyRV5z3rRgms2vq94jjC-kQ2PxD30vp1HGkjxH40I1PIr9LqVGduQB9XfXfte-g5fjQq_4USGnMsma2LUTdUwcg4cKQO1ag0sJ3VkWr8L_M9Wf0njCV20NkbBeP2Ch8THpTTzLz7yu7JfPt0y29OLLDM9cds22jF2CUodiiHNNw",
+                "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTA4MDY1ODQsImV4cCI6MTY5MDgxMDE4NCwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MDgwNjU4NCwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.HawuegPdD78KL6KHyhISmJMO05gD62DmMPU_I2B2eEMSQ7KD37D5vjRMHOQXyzB4NEszPLnVHp2RZyeca-3P8Cc2UDP5dbMhj298qnE_AJltdVaZT4R13mjZ3vopxfWmZzKbDI9L2nLDzQX39aB0H_a-CUv7Umu3ixFkNCIM1AMj_y7HfIsPIBTqfe27QlZVdD8F6AjDicNl3ASczWJ0oxn6V0tFry2KiN5UbbM0IQWKmIgM-pbrCoTUXyuJwAJN5S3YUr784Q1xXt9qVDiCRnw4BYOO09VsWvH3kfDBy6zFcmLaQG5HturjKJleXd4xVo6tnqoUvbfO4IqxQPcbPg",
                 "tokenType": "Bearer",
                 "scope": "naji_api_scope",
-                "createdAt": 1690798357430,
+                "createdAt": 1690806558704,
                 "expiresIn": 3600000
             }
         }
@@ -70,19 +70,11 @@ app.use((req, res, next) => {
     next()
 })
 
-// const options = yaml.load(fs.readFileSync('./swagger.yaml', 'utf8'));
+const options = yaml.load(fs.readFileSync(`${__dirname}/../swagger.yaml`, 'utf8'));
 
-// const swaggerSpec = swaggerJSDoc({
-//     definition: {
-//         openapi: "3.0.0",
-//         info: {
-//             title: 'REST API Docs',
-//             version: '1.0.0'
-//         }
-//     }, apis: ['./routes/*.ts', './models/*.ts']
-// });
+const swaggerSpec = swaggerJSDoc(options!);
 
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // FIX:
 app.route('/api/shayrad/v1/hello')

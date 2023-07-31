@@ -6,11 +6,11 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - dbdata7:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=shayrad
-      - MONGO_INITDB_ROOT_PASSWORD=paklean1392
-      - MONGO_INITDB_DATABASE=shayrad_police
+      - dbdata6:/data/db
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME=shayrad
+    #   - MONGO_INITDB_ROOT_PASSWORD=paklean1392
+    #   - MONGO_INITDB_DATABASE=shayrad_police
 
   node-app:
     build: .
@@ -25,4 +25,4 @@ services:
       - /usr/src/app/node_modules
 
 volumes:
-  dbdata7:
+  dbdata6:
