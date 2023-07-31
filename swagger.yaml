@@ -55,7 +55,85 @@ definition:
             content:
               application/json:
                 schema:
-                  $ref: '#/components/errors/CustomError'
+                  $ref: '#/components/schemas/CustomError'
+    /user/driving-licenses/negative-points:
+      post:
+        tags:
+          - Licenses
+        summary: get negative points
+        description: get users deriving licenses negative points
+        requestBody:
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/requests/WithOtp'
+                  - $ref: '#/components/requests/WithNoOtp'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/NegativePoints'
+          '400':
+            description: Failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CustomError'
+    /user/license-plates:
+      post:
+        tags:
+          - Plates
+        summary: get license plates
+        description: get all users deriving license plates
+        requestBody:
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/requests/WithOtp'
+                  - $ref: '#/components/requests/WithNoOtp'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/LicensePlate'
+          '400':
+            description: Failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CustomError'
+    /user/license-plates/violations/report:
+      post:
+        tags:
+          - Violations
+        summary: get violations
+        description: get all user's license plates violations separately + total
+        requestBody:
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/requests/WithOtp'
+                  - $ref: '#/components/requests/WithNoOtp'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/LicensePlate'
+          '400':
+            description: Failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CustomError'
   components:
     requests:
       WithNoOtp:
@@ -84,20 +162,6 @@ definition:
             type: string
             required: true
             example: '228897'
-    errors:
-      CustomError:
-        type: object
-        properties:
-          code:
-            type: string
-            required: true
-          status:
-            type: string
-            required: true
-            example: string
-          errMsg:
-            type: string
-            required: true
     schemas:
       DrivingLicense:
         type: array
@@ -122,6 +186,53 @@ definition:
             validYears:
               type: string
               example: '10'
+      NegativePoints:
+        type: object
+        properties:
+          negativePoint:
+            type: string
+            example: '0'
+          isDrivingAllowed:
+            type: boolean
+            example: true
+      LicensePlate:
+        type: array
+        items:
+          type: object
+          properties:
+            nationalCode:
+              type: string
+              example: '0083084304'
+            serial:
+              type: string
+              example: '10100441445188'
+            licensePlateNumber:
+              type: string
+              example: '400479696'
+            description:
+              type: string
+              example: null
+            separationDate:
+              type: string
+              example: null
+            licensePlate:
+              type: string
+              example: 'ایران ۴۰ - ۶۹۶ ج  ۷۹'
+      CustomError:
+        type: object
+        properties:
+          code:
+            type: string
+            required: true
+            example: '431'
+          status:
+            type: string
+            required: true
+            example: 'fail'
+          errMsg:
+            type: string
+            required: true
+            example: 'needs an otp'
 
 apis:
   - ./routes/*.ts
