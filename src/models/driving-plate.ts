@@ -137,4 +137,4 @@ plateSchema.pre('save', async function (next) {
 
 const Plate = model<IPlate, PlateModel>('Plate', plateSchema);
 
-export { Plate }
+export { Plate, PlateModel }

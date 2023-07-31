@@ -14,7 +14,7 @@ services:
 
   node-app:
     build: .
-    image: node-app
+    image: node-app-shayrad
     env_file: .env
     ports:
       - '7890:7890'

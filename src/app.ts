@@ -10,6 +10,10 @@ import { errorHandler } from './middlewares/error-handler';
 import { CustomError } from './utils/custom-error';
 import { token } from './utils/token';
 import { catchAsync } from './utils/catch-async';
+import fs from 'node:fs';
+import yaml from 'js-yaml';
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }))
@@ -54,10 +58,10 @@ app.use((req, res, next) => {
     req.token = {
         getToken() {
             return {
-                "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTA2NTc1MTgsImV4cCI6MTY5MDY2MTExOCwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MDY1NzUxOCwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.E4ktHipUVc1hBAVwkhTFy7BfKBvhcjolMLMdKh4dfxKINLNwn4POcyYGjJJmlE6wKAkGsxv9xgzzVBSl1wwHWk6yuREsp_oW5CXhdyumQ6rME5apR2guTuYt9SI4bUXbocbLdL-UjvRfZP_xobl7RBXXCIQnEFTP11UQGt_JVVo_g-PJOJYh4TrYDE3pwWIyfqzVAJXwkzI1k0zbwL-5dFTYemyA-qPUXKUvpWF0IKrCshkUoipkV1hJZDSKpW3usvx9Mru5MGfq13vEBf8cfFIc5XnA-VrAwwo2k-UtJdTyRbOnEvHsBXURzVUBZC3394LlqRFJtRUN9KNqtUOeNA",
+                "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTA3OTgzODMsImV4cCI6MTY5MDgwMTk4MywiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MDc5ODM4Mywic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.IKWpyuQZK_VSGCmfkrW_dgoGt2by8ZHs6hpQ3oEEPatoTDSy3SsbNCFrpJqrIr34zoBhMqQmFBjWsmusjRSUq5ry3fzBD7ZyBAdZ2RuRoyGv8DdqwbFpmPG2idjJ28b1gln37hxuYdKNtp6yfjDRVrA9fFxtmE3TvcSVitf2pRSjyRV5z3rRgms2vq94jjC-kQ2PxD30vp1HGkjxH40I1PIr9LqVGduQB9XfXfte-g5fjQq_4USGnMsma2LUTdUwcg4cKQO1ag0sJ3VkWr8L_M9Wf0njCV20NkbBeP2Ch8THpTTzLz7yu7JfPt0y29OLLDM9cds22jF2CUodiiHNNw",
                 "tokenType": "Bearer",
                 "scope": "naji_api_scope",
-                "createdAt": 1690657494748,
+                "createdAt": 1690798357430,
                 "expiresIn": 3600000
             }
         }
@@ -65,6 +69,20 @@ app.use((req, res, next) => {
     }
     next()
 })
+
+// const options = yaml.load(fs.readFileSync('./swagger.yaml', 'utf8'));
+
+// const swaggerSpec = swaggerJSDoc({
+//     definition: {
+//         openapi: "3.0.0",
+//         info: {
+//             title: 'REST API Docs',
+//             version: '1.0.0'
+//         }
+//     }, apis: ['./routes/*.ts', './models/*.ts']
+// });
+
+// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // FIX:
 app.route('/api/shayrad/v1/hello')

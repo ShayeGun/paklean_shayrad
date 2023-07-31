@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { validateUser } from "../controllers/auth-controller";
-import { getDrivingLicenses, getNegativePoints, getLicensePlates, getViolationReport, getViolationImage, getViolationAggregate, getViolationNoAuth, getPlateDoc } from "../controllers/license-controller";
+import { validateUser } from "../middlewares/auth-controller";
+import { getDrivingLicenses, getNegativePoints, getLicensePlates, getViolationReport, getViolationImage, getViolationAggregate, getPlateDoc } from "../controllers/license-controller";
 import { User } from "../models/user";
 import { getPassport } from "../controllers/passport";
+import { checkPlate } from "../middlewares/check-plate";
 
 const router = Router();
 
@@ -16,16 +17,13 @@ router.route('/license-plates')
     .post(validateUser, getLicensePlates);
 
 router.route('/license-plates/violations/report')
-    .post(validateUser, getViolationReport);
+    .post(validateUser, checkPlate, getViolationReport);
 
 router.route('/license-plates/violations/image')
-    .post(validateUser, getViolationImage);
+    .post(validateUser, checkPlate, getViolationImage);
 
 router.route('/license-plates/violations/aggregate')
-    .post(validateUser, getViolationAggregate);
-
-router.route('/license-plates/violations/no-auth')
-    .post(validateUser, getViolationNoAuth);
+    .post(validateUser, checkPlate, getViolationAggregate);
 
 router.route('/license-plates/document')
     .post(validateUser, getPlateDoc);
