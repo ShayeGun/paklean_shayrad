@@ -6,6 +6,7 @@ import { PostRequest } from "../utils/request-class/post-request";
 import { Plate, PlateModel } from "../models/driving-plate";
 import { CustomError } from "../utils/custom-error";
 import { Violation } from "../models/plate-violations";
+import { errorTranslator } from "../utils/error-translator";
 
 const SaveOrUpdatePlate = async (nationalCode: string, plate: Record<string, any>, plateModel: PlateModel) => {
     const data = {
@@ -14,7 +15,7 @@ const SaveOrUpdatePlate = async (nationalCode: string, plate: Record<string, any
     }
     const existedPlate = await plateModel.findOne(data);
 
-    if (!existedPlate?.licensePlateNumber) {
+    if (!existedPlate) {
         const newPlate = new plateModel({ nationalCode, ...plate });
         newPlate.save();
 
@@ -132,10 +133,13 @@ export const getLicensePlates = catchAsync(async (req: Request, res: Response, n
 
     for (let plate of plates) {
 
-        await SaveOrUpdatePlate(req.user!.nationalCode, plate, Plate);
+        const existedPlate = await SaveOrUpdatePlate(req.user!.nationalCode, plate, Plate);
 
         // add national code to plates view
         plate.nationalCode = req.user!.nationalCode;
+        // add formatted plate to response + vehicle type
+        plate.formattedPlate = existedPlate.formattedPlate;
+        plate.vehicleType = existedPlate.vehicleType;
         // only show plates in result which haven't been separated --> if (!plate.separationDate)
         platesArr.push(plate);
     }
@@ -144,74 +148,90 @@ export const getLicensePlates = catchAsync(async (req: Request, res: Response, n
 })
 
 export const getViolationReport = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${req.body.licensePlate}/violations/report`, req.token);
+        const violations = await request.call();
 
-    const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${req.body.licensePlate}/violations/report`, req.token);
-    const violations = await request.call();
+        const existedPlate = await SaveOrUpdatePlate(req.user!.nationalCode, { licensePlateNumber: req.body.licensePlate }, Plate);
 
-    const existedPlate = await SaveOrUpdatePlate(req.user!.nationalCode, { licensePlateNumber: req.body.licensePlate }, Plate);
+        let violationsUpdated = false;
 
-    let violationsUpdated = false;
+        for (let violation of violations.violations) {
+            const existedViolation = await Violation.findOne({ violationId: violation.violationId });
 
-    for (let violation of violations.violations) {
-        const existedViolation = await Violation.findOne({ violationId: violation.violationId });
+            // violation which exist violationId != "0" and is not already saved in DB 
+            if (violation.violationId !== "0" && !existedViolation) {
+                const newViolation = new Violation(violation);
+                await newViolation.save();
 
-        // violation which exist violationId != "0" and is not already saved in DB 
-        if (violation.violationId !== "0" && !existedViolation) {
-            const newViolation = new Violation(violation);
-            await newViolation.save();
+                // WARN: don't know if its good to push each violation one by one and save them or add them all together and then save them all at once ???
+                existedPlate.vehicleViolations.push(newViolation._id);
+                await existedPlate.save();
 
-            // WARN: don't know if its good to push each violation one by one and save them or add them all together and then save them all at once ???
-            existedPlate.vehicleViolations.push(newViolation._id);
+                violationsUpdated = true;
+            }
+        }
+
+        // only change total-payment info when violations have been changed
+        if (violationsUpdated) {
+            let violationCopy = { ...violations }
+            delete violationCopy.violations
+
+            for (let [k, v] of Object.entries(violationCopy)) {
+                existedPlate.totalViolationInfo[k] = v;
+            }
+
+            // for some who knows reasons mongoose only updates existedPlate.totalViolationInfo if we say to it manually that totalViolationInfo field have been changed so updated |-_-|
+            existedPlate.markModified('totalViolationInfo');
             await existedPlate.save();
-
-            violationsUpdated = true;
-        }
-    }
-
-    // only change total-payment info when violations have been changed
-    if (violationsUpdated) {
-        let violationCopy = { ...violations }
-        delete violationCopy.violations
-
-        for (let [k, v] of Object.entries(violationCopy)) {
-            existedPlate.totalViolationInfo[k] = v;
         }
 
-        // for some who knows reasons mongoose only updates existedPlate.totalViolationInfo if we say to it manually that totalViolationInfo field have been changed so updated |-_-|
-        existedPlate.markModified('totalViolationInfo');
-        await existedPlate.save();
+        res.status(200).send(violations);
+    } catch (err) {
+        return next(errorTranslator(err, [{
+            errStatus: 400,
+            resStatus: 440,
+            msg: 'user doesn\'t own the license plate'
+        }]));
     }
 
-    res.status(200).send(violations);
 });
 
 export const getViolationImage = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const violationId = req.body.violationId ? req.body.violationId : '';
+        if (!violationId) return next(new CustomError('you must proved a violation id', 400, 438));
 
-    const violationId = req.body.violationId ? req.body.violationId : '';
-    if (!violationId) return next(new CustomError('you must proved a violation id', 400, 438));
+        // WARN: save data without validating it <by calling shayrad api to validate it> in the future might cause some problems
+        const plate = await SaveOrUpdatePlate(req.user!.nationalCode, { licensePlateNumber: req.body.licensePlate }, Plate);
 
-    const plate = await SaveOrUpdatePlate(req.user!.nationalCode, { licensePlateNumber: req.body.licensePlate }, Plate);
-
-    const existedPlate = await plate.populate({
-        path: 'vehicleViolations',
-        match: { violationId: violationId }
-    });
+        const existedPlate = await plate.populate({
+            path: 'vehicleViolations',
+            match: { violationId: violationId }
+        });
 
 
-    if (existedPlate?.vehicleViolations.length === 0) return next(new CustomError('this violation id doesn\'t belong to this license plate', 400, 440));
+        if (existedPlate?.vehicleViolations.length === 0) return next(new CustomError('this violation id doesn\'t belong to this license plate', 400, 440));
 
-    const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${req.body.licensePlate}/violations/${(existedPlate?.vehicleViolations[0] as any).violationId}/image`, req.token);
+        const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${req.body.licensePlate}/violations/${(existedPlate?.vehicleViolations[0] as any).violationId}/image`, req.token);
 
-    const image = await request.call();
+        const image = await request.call();
 
-    // save images to DB if not existed
-    if (!(existedPlate?.vehicleViolations[0] as any).vehicleImage) {
-        (existedPlate?.vehicleViolations[0] as any).vehicleImage = image.vehicleImage;
-        (existedPlate?.vehicleViolations[0] as any).plateImage = image.plateImage;
-        await (existedPlate?.vehicleViolations[0] as any).save();
+        // save images to DB if not existed
+        if (!(existedPlate?.vehicleViolations[0] as any).vehicleImage) {
+            (existedPlate?.vehicleViolations[0] as any).vehicleImage = image.vehicleImage;
+            (existedPlate?.vehicleViolations[0] as any).plateImage = image.plateImage;
+            await (existedPlate?.vehicleViolations[0] as any).save();
+        }
+
+        res.status(200).send(image);
+    } catch (err) {
+        return next(errorTranslator(err, [{
+            errStatus: 400,
+            resStatus: 441,
+            msg: 'user doesn\'t own the license plate OR violation id is invalid'
+        }]));
     }
-
-    res.status(200).send(existedPlate);
 });
 
 export const getViolationAggregate = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -237,27 +257,28 @@ export const getViolationAggregate = catchAsync(async (req: Request, res: Respon
 })
 
 export const getPlateDoc = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${req.body.licensePlate}/documents/status`, req.token);
+        const status = await request.call();
 
-    const licensePlate = req.body.licensePlate ? req.body.licensePlate : '';
-    if (!licensePlate) return next(new CustomError('you must proved a license plate', 400, 436));
+        const existedPlate = await SaveOrUpdatePlate(req.user!.nationalCode, { licensePlateNumber: req.body.licensePlate }, Plate);
 
-    const existedPlate = await Plate.findOne({
-        licensePlateNumber: licensePlate,
-        nationalCode: req.user!.nationalCode
-    });
-    if (!existedPlate?.licensePlateNumber) return next(new CustomError('user doesn\'t own license plate', 400, 437));
+        for (let [k, v] of Object.entries(status)) {
+            // plateChar is already saved
+            if (k === 'plateChar') continue;
+            if ((existedPlate as any)[k] !== v) (existedPlate as any)[k] = v
+        }
 
-    const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${existedPlate.licensePlateNumber}/documents/status`, req.token);
+        if (existedPlate.isModified()) await existedPlate.save();
 
-    const status = await request.call();
-
-    for (let [k, v] of Object.entries(status)) {
-        // plateChar is already saved
-        if (k === 'plateChar') continue;
-        if ((existedPlate as any)[k] !== v) (existedPlate as any)[k] = v
+        res.status(200).send(status);
+    } catch (err) {
+        return next(errorTranslator(err, [{
+            errStatus: 500,
+            resStatus: 440,
+            msg: 'user doesn\'t own the license plate'
+        }]));
     }
 
-    if (existedPlate.isModified()) await existedPlate.save();
 
-    res.status(200).send(status);
 });

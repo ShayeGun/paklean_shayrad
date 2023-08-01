@@ -2,7 +2,7 @@ import { Model, model, Schema, Types } from 'mongoose';
 
 function getVehicleType(plateNum: string) {
     if (plateNum.length === 9) return vehicle.car
-    else if (plateNum.length === 11 && plateNum.slice(0, 2) === "08") return vehicle.motor
+    else if (plateNum.length === 11 && plateNum.slice(0, 2) === "08") return vehicle.cycle
     // future plate types
     return vehicle.else
 }
@@ -22,7 +22,7 @@ function formatLicensePlate(plateNum: string, vehicleType: vehicle) {
         }
 
     }
-    else if (vehicleType === vehicle.motor) {
+    else if (vehicleType === vehicle.cycle) {
         const leftConstant = plateNum.slice(0, 2);
         const upperSection = plateNum.slice(2, 5);
         const leftSection = plateNum.slice(5, 10);
@@ -60,7 +60,7 @@ const plateLetters: Record<string, string> = {
 
 enum vehicle {
     car = 'car',
-    motor = 'motor',
+    cycle = 'cycle',
     else = ''
 }
 

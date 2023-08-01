@@ -6,9 +6,7 @@ import { Passport } from "../models/passport";
 export const getPassport = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
     const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/passport/status`, req.token);
-
     const passport = await request.call();
-
     let existedPassport: any;
 
     if (passport.hasPassport === false) {
@@ -29,9 +27,6 @@ export const getPassport = catchAsync(async (req: Request, res: Response, next: 
         newPassport.nationalCode = req.user!.nationalCode;
         await newPassport.save();
     }
-
-    // add national code to passport view
-    passport.nationalCode = req.user!.nationalCode;
 
     res.status(200).send(passport);
 })

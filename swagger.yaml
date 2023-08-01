@@ -14,14 +14,16 @@ definition:
       description: Everything about your driving license
     - name: Plates
       description: Everything about your license plate
-    - name: violations
-      description: Operations about user
+    - name: Violations
+      description: Everything about your plate violations
+    - name: Passport
+      description: Everything about your passport
 
   paths:
     /hello:
       get:
         summary: Send a text to the server
-        description: Send a message to the server and get a response added to the original text.
+        description: Send a message to the server & get a response added to the original text.
         responses:
           '200':
             description: Success
@@ -108,6 +110,30 @@ definition:
               application/json:
                 schema:
                   $ref: '#/components/schemas/CustomError'
+    /user/license-plates/document:
+       post:
+        tags:
+          - Plates
+        summary: get docs for specified license plate
+        description: get docs for specified license plate 
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/requests/withPlate'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Image'
+          '400':
+            description: Failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CustomError'
     /user/license-plates/violations/report:
       post:
         tags:
@@ -118,22 +144,80 @@ definition:
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/requests/WithOtp'
-                  - $ref: '#/components/requests/WithNoOtp'
+                $ref: '#/components/requests/withPlate'
         responses:
           '200':
             description: Success
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/LicensePlate'
+                  $ref: '#/components/schemas/Violation'
           '400':
             description: Failed
             content:
               application/json:
                 schema:
                   $ref: '#/components/schemas/CustomError'
+    /user/license-plates/violations/image:
+       post:
+        tags:
+          - Violations
+        summary: get violation image
+        description: get user's license plate violation image base on given violation id
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/requests/withPlateViolation'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Image'
+          '400':
+            description: Failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CustomError'
+    /user/license-plates/violations/aggregate:
+       post:
+        tags:
+          - Violations
+        summary: get all violation
+        description: get all license plate violation 
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/requests/withPlate'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Image'
+    /user/passport:
+       post:
+        tags:
+          - Passport
+        summary: user passport
+        description: get all user passport info
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/requests/WithOtp'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Passport'   
   components:
     requests:
       WithNoOtp:
@@ -158,6 +242,48 @@ definition:
             type: string
             required: true
             example: '09384009969'
+          otp:
+            type: string
+            required: true
+            example: '228897'
+      withPlate:
+        type: object
+        properties:
+          nationalCode:
+            type: string
+            required: true
+            example: '0022553975'
+          mobile:
+            type: string
+            required: true
+            example: '09384009969'
+          licensePlate:
+            type: string
+            required: true
+            example: '400479696'
+          otp:
+            type: string
+            required: true
+            example: '228897'
+      withPlateViolation:
+        type: object
+        properties:
+          nationalCode:
+            type: string
+            required: true
+            example: '0022553975'
+          mobile:
+            type: string
+            required: true
+            example: '09384009969'
+          licensePlate:
+            type: string
+            required: true
+            example: '400479696'
+          violationId:
+            type: string
+            required: true
+            example: '0806725566'
           otp:
             type: string
             required: true
@@ -218,6 +344,197 @@ definition:
             licensePlate:
               type: string
               example: 'ایران ۴۰ - ۶۹۶ ج  ۷۹'
+            formattedPlate:
+              type: object
+              properties:
+                provenance:
+                  type: string
+                  example: '40'
+                letter:
+                  type: string
+                  example: 'ج'
+                leftSection:
+                  type: string
+                  example: '79'
+                rightSection:
+                  type: string
+                  example: '696'
+            vehicleType:
+              type: string
+              enum:
+                - car
+                - cycle
+              example: car
+      PlateDoc:
+        type: object
+        properties:
+          cardPrintDate:
+            type: string
+            example: '1391/03/28'
+          cardPostalBarcode:
+            type: string
+            example: '21691000031156038477'
+          cardStatusTitle:
+            type: string
+            example: 'تحويل شده به پست'
+          documentPrintDate:
+            type: string
+            example: '1391/03/28'
+          documentPostalBarcode:
+            type: string
+            example: 'string | null'
+          documentStatusTitle:
+            type: string
+            example: 'صدور'
+          plateChar:
+            type: string
+            example: 'ایران ۴۰ - ۶۴۶ ق  ۷۵'
+      Violation:
+        type: object
+        properties:
+          violations:
+            type: array
+            items:
+              type: object
+              properties:
+                violationId:
+                  type: string
+                  example: '0806725566'
+                violationOccuredDate:
+                  type: string
+                  example: '1401/04/10 - 09:34'
+                violationOccuredTime:
+                  type: string
+                  example: '09:34'
+                violationDeliveryType:
+                  type: object
+                  properties:
+                    violationDeliveryTypeName:
+                      type: string
+                      example: 'دوربين'
+                violationAddress:
+                  type: string
+                  example: 'تهران ت-ف امين آباد 5 کيل قبل هراندي'
+                violationType:
+                  type: object
+                  properties:
+                    violationTypeId:
+                      type: string
+                      example: '2056'
+                    violationTypeName:
+                      type: string
+                      example: 'تجاوز از سرعت مجاز (تا سي كيلومتر در ساعت)'
+                finalPrice:
+                  type: string
+                  example: '630000'
+                paperId:
+                  type: string
+                  example: '672556600293'
+                paymentId:
+                  type: string
+                  example: '63013043'
+                hasImage:
+                  type: boolean
+                  example: true
+          plateDictation:
+            type: string
+            example: "شصت ونه ص نهصد وهشتاد وپنج -  ايران شصت وهشت"
+          plateChar:
+            type: string
+            example: "شخصي  ايران 68 ــ  985و69"
+          updateViolationsDate:
+            type: string
+            example: "1401/06/10"
+          inquiryDate:
+            type: string
+            example: "1401/06/10"
+          inquiryTime:
+            type: string
+            example: "20:25"
+          priceStatus:
+            type: string
+            description: 1 means plate has violation report & 0 means plate doesn't have any violation report 
+            example: "1"
+          inquirePrice:
+            type: string
+            example: "5909000"
+          paperId:
+            type: string
+            example: "8820126500199"
+          paymentId:
+            type: string
+            example: "570813011"
+      Image:
+        type: object
+        properties:
+          violationId:
+            type: string
+            example: '0806725566'
+          plateImage:
+            type: string
+            example: 'base64 string'
+          vehicleImage:
+            type: string
+            example: 'base64 string'
+      Aggregate:
+        type: object
+        properties:
+          plateChar:
+            type: string
+            example: 'شخصي  ايران 41 ــ  686ج79"'
+          complaintStatus:
+            type: string
+            example: 'شکايت بالاي 1م'
+          complaint:
+            type: string
+            description: depends on complaintStatus field & 0 means plate doesn't have any complaint
+            example: '1'
+          priceStatus:
+            type: string
+            description: 1 means plate has violation report & 0 means plate doesn't have any violation report
+            example: '1'
+          paperId:
+            type: string
+            example: '8833798100197'
+          paymentId:
+            type: string
+            example: '3274613101'
+          price:
+            type: integer
+            example: 32043000
+      Passport:
+        type: object
+        properties:
+          hasPassport:
+            type: boolean
+            example: true
+          hasRequest:
+            type: boolean
+            example: true
+          isPersonFound:
+            type: boolean
+            example: true
+          requestStatue:
+            type: string
+            example: 'روند رسيدگي درخواست تکميل شده است'
+          requestDate:
+            type: string
+            example: '1400/02/21'
+          postBarcode:
+            type: string
+            example: '19900000012268110022'
+          passportNo:
+            type: string
+            example: 'X62137632'
+          issueDate:
+            type: string
+            example: '1400/02/21'
+          expiryDate:
+            type: string
+            example: '1405/02/21'
+          status:
+            type: string
+            example: 'معتبر'
       CustomError:
         type: object
         properties:
