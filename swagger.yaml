@@ -111,11 +111,11 @@ definition:
                 schema:
                   $ref: '#/components/schemas/CustomError'
     /user/license-plates/document:
-       post:
+      post:
         tags:
           - Plates
         summary: get docs for specified license plate
-        description: get docs for specified license plate 
+        description: get docs for specified license plate
         requestBody:
           content:
             application/json:
@@ -159,7 +159,7 @@ definition:
                 schema:
                   $ref: '#/components/schemas/CustomError'
     /user/license-plates/violations/image:
-       post:
+      post:
         tags:
           - Violations
         summary: get violation image
@@ -183,11 +183,11 @@ definition:
                 schema:
                   $ref: '#/components/schemas/CustomError'
     /user/license-plates/violations/aggregate:
-       post:
+      post:
         tags:
           - Violations
         summary: get all violation
-        description: get all license plate violation 
+        description: get all license plate violation
         requestBody:
           content:
             application/json:
@@ -199,9 +199,9 @@ definition:
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/Image'
+                  $ref: '#/components/schemas/Aggregate'
     /user/passport:
-       post:
+      post:
         tags:
           - Passport
         summary: user passport
@@ -217,7 +217,7 @@ definition:
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/Passport'   
+                  $ref: '#/components/schemas/Passport'
   components:
     requests:
       WithNoOtp:
@@ -438,32 +438,32 @@ definition:
                   example: true
           plateDictation:
             type: string
-            example: "شصت ونه ص نهصد وهشتاد وپنج -  ايران شصت وهشت"
+            example: 'شصت ونه ص نهصد وهشتاد وپنج -  ايران شصت وهشت'
           plateChar:
             type: string
-            example: "شخصي  ايران 68 ــ  985و69"
+            example: 'شخصي  ايران 68 ــ  985و69'
           updateViolationsDate:
             type: string
-            example: "1401/06/10"
+            example: '1401/06/10'
           inquiryDate:
             type: string
-            example: "1401/06/10"
+            example: '1401/06/10'
           inquiryTime:
             type: string
-            example: "20:25"
+            example: '20:25'
           priceStatus:
             type: string
-            description: 1 means plate has violation report & 0 means plate doesn't have any violation report 
-            example: "1"
+            description: 1 means plate has violation report & 0 means plate doesn't have any violation report
+            example: '1'
           inquirePrice:
             type: string
-            example: "5909000"
+            example: '5909000'
           paperId:
             type: string
-            example: "8820126500199"
+            example: '8820126500199'
           paymentId:
             type: string
-            example: "570813011"
+            example: '570813011'
       Image:
         type: object
         properties:
