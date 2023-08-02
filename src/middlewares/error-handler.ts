@@ -1,6 +1,7 @@
 import { CustomError } from "../utils/custom-error"
-import { ErrorRequestHandler, Response } from "express"
+import { ErrorRequestHandler, Response, Request } from "express"
 import { errorTranslator } from "../utils/error-translator";
+import { User } from "../models/user";
 
 const sendError = (err: CustomError | Error, res: Response) => {
     if (err instanceof CustomError) {
@@ -10,15 +11,13 @@ const sendError = (err: CustomError | Error, res: Response) => {
     else {
         // unwanted data
         delete (err as any).request;
-        delete (err as any).response;
+        // delete (err as any).response;
         delete (err as any).config;
 
         console.log(Object.keys(err));
         for (const [k, v] of Object.entries(err)) {
             console.log(`${k} ===> ${v}`);
         }
-        console.log(err.message);
-
 
         res.status(500).send('oh oh sth bad happened 😓')
 
@@ -47,7 +46,11 @@ function handleTokenExpired() {
     return new CustomError('token expired Please login again!', 401, 1202);
 }
 
-async function shayradUserIdExpired(err: any) {
+async function shayradUserIdExpired(err: any, req: Request) {
+    // delete user's userId so he/she has to get new otp
+    const user = await User.findOne({ nationalCode: req.user!.nationalCode, mobile: req.user!.mobile });
+    user!.userId = '';
+    await user?.save();
     return new CustomError('user\'s userId (authentication) expired', 400, 433)
 }
 
@@ -71,6 +74,14 @@ const errorHandler: ErrorRequestHandler = async (err, req, res, next) => {
         error = handleTokenExpired();
     }
 
+    // don't change this if/else statement with the one below it (AxiosError) 
+    else if (err.response?.status === 500 && err.response.data?.Message === '127:unhandled exception please call admin') {
+        console.log('here');
+
+        error = await shayradUserIdExpired(error, req);
+
+    }
+
     else if (error.name === 'AxiosError') {
         error = errorTranslator(error, [{
             errStatus: 504,
@@ -82,10 +93,6 @@ const errorHandler: ErrorRequestHandler = async (err, req, res, next) => {
             resStatus: 500,
             msg: "please contact admins 😱"
         }])
-    }
-
-    else if (err.response?.status === 500 && err.response.data?.Message === '127:unhandled exception please call admin') {
-        error = await shayradUserIdExpired(error);
     }
 
     sendError(error, res)
