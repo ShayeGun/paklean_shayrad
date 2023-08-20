@@ -10,26 +10,18 @@ import { errorTranslator } from "../utils/error-translator";
 import mongoose from "mongoose";
 import { User } from "../models/user";
 
-const SaveOrUpdateModel = async <T extends typeof mongoose.Model>(nationalCode: string, plate: Record<string, any>, model: T) => {
-    const data = {
-        nationalCode,
-        ...plate
-    };
-    console.log(data);
-
-    const existedPlate = await model.findOne(data);
-
-    console.log(existedPlate);
+const SaveOrUpdateModel = async <T extends typeof mongoose.Model, Y extends { nationalCode: string; }>(identifier: Y, data: Record<string, any>, model: T) => {
+    const existedPlate = await model.findOne(identifier);
 
 
     if (!existedPlate) {
-        const newPlate = new model({ nationalCode, ...plate });
+        const newPlate = new model({ ...identifier, ...data });
         newPlate.save();
 
         return newPlate;
     }
     else {
-        for (let [k, v] of Object.entries(plate)) {
+        for (let [k, v] of Object.entries(data)) {
             if ((existedPlate as any)[k] !== v) (existedPlate as any)[k] = v;
         }
 
@@ -41,54 +33,60 @@ const SaveOrUpdateModel = async <T extends typeof mongoose.Model>(nationalCode: 
 
 export const getDrivingLicenses = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/driving-licenses`, req.token);
-
     const licenses = await request.call();
 
     let licensesArr: Record<string, any>[] = [];
 
     for (let license of licenses) {
 
-        let existedLicense: any;
+        const nationalCode = req.body.nationalCode;
+        const title = license.title;
+        const printNumber = license.printNumber;
 
-        if (license.nationalCode === null) {
-            existedLicense = await License.findOne({
-                nationalCode: req.user!.nationalCode
-            });
-        }
-        else {
-            existedLicense = await License.findOne({
-                barcode: license.barcode,
-                title: license.title
-            });
-        }
+        const d = await SaveOrUpdateModel({ nationalCode, title, printNumber }, license, License);
+        licensesArr.push(d);
 
-        // if the license isn't already existed in DB -> add new license
-        if (!existedLicense) {
-            const newLicense = new License(license);
-            // for user's that don't have license (license.nationalCode = null)
-            newLicense.nationalCode = req.user!.nationalCode;
-            await newLicense.save();
+        // let existedLicense: any;
 
-            // update user's first and last name if its not defined -- shayrad's doing not mine sry )^,_^)
-            if (req.user!.firstName === "-" || req.user!.lastName === "-") {
-                // for user's that don't have license (license.firstName = null)
+        // if (license.nationalCode === null) {
+        //     existedLicense = await License.findOne({
+        //         nationalCode: req.user!.nationalCode
+        //     });
+        // }
+        // else {
+        //     existedLicense = await License.findOne({
+        //         barcode: license.barcode,
+        //         title: license.title
+        //     });
+        // }
 
-                req.user!.firstName = license.firstName ? license.firstName : "-";
-                // for user's that don't have license (license.lastName = null)
-                req.user!.lastName = license.lastName ? license.lastName : "-";
+        // // if the license isn't already existed in DB -> add new license
+        // if (!existedLicense) {
+        //     const newLicense = new License(license);
+        //     // for user's that don't have license (license.nationalCode = null)
+        //     newLicense.nationalCode = req.user!.nationalCode;
+        //     await newLicense.save();
 
-                await req.user!.save();
-                licensesArr.push(newLicense);
-                continue;
-            }
-        }
+        //     // update user's first and last name if its not defined -- shayrad's doing not mine sry )^,_^)
+        //     if (req.user!.firstName === "-" || req.user!.lastName === "-") {
+        //         // for user's that don't have license (license.firstName = null)
 
-        // add national code to plates view
-        license.nationalCode = req.user!.nationalCode;
-        // for consistency in api
-        delete license.firstName;
-        delete license.lastName;
-        licensesArr.push(license);
+        //         req.user!.firstName = license.firstName ? license.firstName : "-";
+        //         // for user's that don't have license (license.lastName = null)
+        //         req.user!.lastName = license.lastName ? license.lastName : "-";
+
+        //         await req.user!.save();
+        //         licensesArr.push(newLicense);
+        //         continue;
+        //     }
+        // }
+
+        // // add national code to plates view
+        // license.nationalCode = req.user!.nationalCode;
+        // // for consistency in api
+        // delete license.firstName;
+        // delete license.lastName;
+        // licensesArr.push(license);
     }
 
     res.status(200).send(licensesArr);
@@ -96,14 +94,12 @@ export const getDrivingLicenses = catchAsync(async (req: Request, res: Response,
 
 export const getNegativePoints = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/driving-licenses/${req.body.drivingLicense}/negative-point`, req.token);
-        // const negPoint = await request.call();
-        const negPoint = {
-            negativePoint: '0',
-            isDrivingAllowed: true
-        };
+        const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/driving-licenses/${req.body.drivingLicense}/negative-point`, req.token);
+        const negPoint = await request.call();
 
-        await SaveOrUpdateModel(req.body.nationalCode, negPoint, User);
+        const nationalCode = req.body.nationalCode;
+
+        await SaveOrUpdateModel({ nationalCode }, negPoint, User);
 
         res.status(200).send(negPoint);
     } catch (err) {
@@ -125,7 +121,9 @@ export const getLicensePlates = catchAsync(async (req: Request, res: Response, n
 
     for (let plate of plates) {
 
-        const existedPlate = await SaveOrUpdateModel(req.user!.nationalCode, plate, Plate);
+        const nationalCode = req.user!.nationalCode;
+        const licensePlateNumber = plate.licensePlateNumber;
+        const existedPlate = await SaveOrUpdateModel({ nationalCode, licensePlateNumber }, plate, Plate);
 
         // add national code to plates view
         plate.nationalCode = req.user!.nationalCode;

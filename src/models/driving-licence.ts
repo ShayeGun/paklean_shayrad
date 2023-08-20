@@ -7,7 +7,7 @@ interface ILicense {
     barcode: string,
     printNumber: string,
     printDate: string,
-    validYears: string
+    validYears: string;
 }
 
 interface ILicenseMethods { }
@@ -36,8 +36,8 @@ const licenseSchema = new Schema<ILicense, LicenseModel, ILicenseMethods>({
 // searches are based on national-code so it must be indexed
 licenseSchema.index({ nationalCode: 1 });
 // combination of barcode and title must be unique and it must not effect national-code cuz 1 person can have multiple licenses
-licenseSchema.index({ barcode: 1, title: 1 }, { unique: true });
+licenseSchema.index({ nationalCode: 1, printNumber: 1, title: 1 }, { unique: true });
 
 const License = model<ILicense, LicenseModel>('License', licenseSchema);
 
-export { License }
+export { License };
