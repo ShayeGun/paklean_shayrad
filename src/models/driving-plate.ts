@@ -1,10 +1,10 @@
 import { Model, model, Schema, Types } from 'mongoose';
 
 function getVehicleType(plateNum: string) {
-    if (plateNum.length === 9) return vehicle.car
-    else if (plateNum.length === 11 && plateNum.slice(0, 2) === "08") return vehicle.cycle
+    if (plateNum.length === 9) return vehicle.car;
+    else if (plateNum.length === 11 && plateNum.slice(0, 2) === "08") return vehicle.cycle;
     // future plate types
-    return vehicle.else
+    return vehicle.else;
 }
 
 function formatLicensePlate(plateNum: string, vehicleType: vehicle) {
@@ -19,7 +19,7 @@ function formatLicensePlate(plateNum: string, vehicleType: vehicle) {
             letter,
             leftSection,
             rightSection
-        }
+        };
 
     }
     else if (vehicleType === vehicle.cycle) {
@@ -33,10 +33,10 @@ function formatLicensePlate(plateNum: string, vehicleType: vehicle) {
             upperSection,
             leftSection,
             rightConstant
-        }
+        };
     }
 
-    return
+    return;
 }
 
 const plateLetters: Record<string, string> = {
@@ -56,7 +56,7 @@ const plateLetters: Record<string, string> = {
     "15": "ه",
     "16": "ی",
     "19": "ژ",
-}
+};
 
 enum vehicle {
     car = 'car',
@@ -132,9 +132,9 @@ plateSchema.pre('save', async function (next) {
     }
 
     next();
-})
+});
 
 
 const Plate = model<IPlate, PlateModel>('Plate', plateSchema);
 
-export { Plate, PlateModel }
+export { Plate };

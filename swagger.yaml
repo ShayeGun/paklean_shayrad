@@ -127,7 +127,7 @@ definition:
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/Image'
+                  $ref: '#/components/schemas/PlateDoc'
           '400':
             description: Failed
             content:

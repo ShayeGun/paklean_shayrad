@@ -16,7 +16,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 const app = express();
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(logger('dev'));
 
@@ -27,7 +27,7 @@ const limiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     message: 'give a break to server for one hour 😮‍💨'
-})
+});
 
 app.use(express.json({ limit: '10kb' }));
 app.use(helmet());
@@ -49,26 +49,26 @@ app.use('/api', limiter);
 
 // FIX: for development only
 app.get('/api/shayrad/v1/get-token', async (req, res, next) => {
-    await token.checkValidity()
-    console.log(token.getToken())
-    res.json(token.getToken())
-})
+    await token.checkValidity();
+    console.log(token.getToken());
+    res.json(token.getToken());
+});
 
 app.use((req, res, next) => {
     req.token = {
         getToken() {
             return {
-                "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTA5MDk0NTUsImV4cCI6MTY5MDkxMzA1NSwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MDkwOTQ1NSwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.aQpvQ-oqv6LrlhaVatoGjL9fWB4Yklj1MPEAlHXVfUn4k89z7LDa_bF3x_YSFqZbWq_-zddbIq6HWUUkgWGeFPxpvgIL-F1d3bpU7TSaNMkT1_7jt3DMaPzno4MWW1dvvMyP3NRPOVw70nkt47TQIR0bEjTYXaHFZQMCgTINbUmKUhWs6u0FrxEviT14aWzJN1yLU8XyN2RJCKYkMcxbx2tRCVKevXXmxJkeEoh5s1jHn-XJiFJnsNHrlkdvNBnDxidJfWq7VXNrne2ubIJxJPmNS9aZRj4NfZhGuEWp1_Rur2rf7Q4ETfDxXUpgdzgmbR6EGPjYavNFTbpR1GOKyQ",
+                "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTI1NDAzOTUsImV4cCI6MTY5MjU0Mzk5NSwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MjU0MDM5NSwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.X8jKflzQZnPR13eQeEMFNcdVocFtTOQTZ0tiqekpTq7zgHEE9MFHFOpYg1F3YkljHFesE-iMFLst1UO94Q3ZJQxTp_Ie2qu_EO_K3LkbZ04m9aeB3mo5TV857KRvbhfhbQf6CNZINLCuvcCZh0r1j9KIZSF9m1i422yoSwCHn-lpIh_LvyUHw06JXzyF8Z3s4_6GuHJXwaFZEeFy-JOL4Ytxuu3Y3hscaoPn6io0ETlOgy-97S6jzQNgTgCDi4JdWtshR5_BjtK_NiKQ4RY_3HC8RLd5nDhaWmHc7nH8F1RD_u2ntIla8v4QSortOUxoJcHx_UeTcgtOOL7YX_D-zA",
                 "tokenType": "Bearer",
                 "scope": "naji_api_scope",
-                "createdAt": 1690909427926,
+                "createdAt": 1692540404581,
                 "expiresIn": 3600000
-            }
+            };
         }
 
-    }
-    next()
-})
+    };
+    next();
+});
 
 const options = yaml.load(fs.readFileSync(`${__dirname}/../swagger.yaml`, 'utf8'));
 
@@ -80,16 +80,16 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.route('/api/shayrad/v1/hello')
     .all(async (req, res) => {
 
-        res.send('hello baby 😉')
-    })
+        res.send('hello baby 😉');
+    });
 
 app.use('/api/shayrad/v1/user', userRoute);
 
 app.use('*', (req, res, next) => {
-    return next(new CustomError('No Such URL Sry 🥲', 404, 404))
+    return next(new CustomError('No Such URL Sry 🥲', 404, 404));
 
-})
+});
 
-app.use(errorHandler)
+app.use(errorHandler);
 
-export { app }
+export { app };

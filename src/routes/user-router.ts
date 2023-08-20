@@ -4,6 +4,7 @@ import { getDrivingLicenses, getNegativePoints, getLicensePlates, getViolationRe
 import { User } from "../models/user";
 import { getPassport } from "../controllers/passport";
 import { checkPlate } from "../middlewares/check-plate";
+import { checkLicense } from "../middlewares/check-license";
 
 const router = Router();
 
@@ -11,7 +12,7 @@ router.route('/driving-licenses')
     .post(validateUser, getDrivingLicenses);
 
 router.route('/driving-licenses/negative-points')
-    .post(validateUser, getNegativePoints);
+    .post(validateUser, checkLicense, getNegativePoints);
 
 router.route('/license-plates')
     .post(validateUser, getLicensePlates);
@@ -36,6 +37,6 @@ router.route('/test').get(async (req, res, next) => {
     const user = await User.find({});
 
     res.status(201).json(user);
-})
+});
 
-export { router as userRoute }
+export { router as userRoute };

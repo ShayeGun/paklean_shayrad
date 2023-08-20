@@ -3,23 +3,30 @@ import { catchAsync } from "../utils/catch-async";
 import { GetRequest } from "../utils/request-class/get-request";
 import { License } from "../models/driving-licence";
 import { PostRequest } from "../utils/request-class/post-request";
-import { Plate, PlateModel } from "../models/driving-plate";
+import { Plate } from "../models/driving-plate";
 import { CustomError } from "../utils/custom-error";
 import { Violation } from "../models/plate-violations";
 import { errorTranslator } from "../utils/error-translator";
+import mongoose from "mongoose";
+import { User } from "../models/user";
 
-const SaveOrUpdatePlate = async (nationalCode: string, plate: Record<string, any>, plateModel: PlateModel) => {
+const SaveOrUpdateModel = async <T extends typeof mongoose.Model>(nationalCode: string, plate: Record<string, any>, model: T) => {
     const data = {
         nationalCode,
-        licensePlateNumber: plate.licensePlateNumber
-    }
-    const existedPlate = await plateModel.findOne(data);
+        ...plate
+    };
+    console.log(data);
+
+    const existedPlate = await model.findOne(data);
+
+    console.log(existedPlate);
+
 
     if (!existedPlate) {
-        const newPlate = new plateModel({ nationalCode, ...plate });
+        const newPlate = new model({ nationalCode, ...plate });
         newPlate.save();
 
-        return newPlate
+        return newPlate;
     }
     else {
         for (let [k, v] of Object.entries(plate)) {
@@ -28,9 +35,9 @@ const SaveOrUpdatePlate = async (nationalCode: string, plate: Record<string, any
 
         if (existedPlate!.isModified()) await existedPlate!.save();
 
-        return existedPlate
+        return existedPlate;
     }
-}
+};
 
 export const getDrivingLicenses = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/driving-licenses`, req.token);
@@ -46,13 +53,13 @@ export const getDrivingLicenses = catchAsync(async (req: Request, res: Response,
         if (license.nationalCode === null) {
             existedLicense = await License.findOne({
                 nationalCode: req.user!.nationalCode
-            })
+            });
         }
         else {
             existedLicense = await License.findOne({
                 barcode: license.barcode,
                 title: license.title
-            })
+            });
         }
 
         // if the license isn't already existed in DB -> add new license
@@ -85,44 +92,29 @@ export const getDrivingLicenses = catchAsync(async (req: Request, res: Response,
     }
 
     res.status(200).send(licensesArr);
-})
+});
 
 export const getNegativePoints = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        // const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/driving-licenses/${req.body.drivingLicense}/negative-point`, req.token);
+        // const negPoint = await request.call();
+        const negPoint = {
+            negativePoint: '0',
+            isDrivingAllowed: true
+        };
 
-    let license = await License.findOne({
-        nationalCode: req.user!.nationalCode
-    })
+        await SaveOrUpdateModel(req.body.nationalCode, negPoint, User);
 
-    // FIX: OPTIONAL throw an error instead of recursive-call
-    if (!license) {
-        // if no license was found request to /driving-licenses end point to create licenses and don't throw any error HURRAY :D
-        const licenseRequest = new PostRequest(`${req.protocol}://${req.get('host')}/api/shayrad/v1/user/driving-licenses`, req.token)
-
-        licenseRequest.setBody({
-            nationalCode: req.user!.nationalCode,
-            mobile: req.user!.mobile,
-            otp: req.body.otp ? req.body.otp : ''
-        })
-
-        // first element of the array cuz license barcode is one to one to the license holder
-        license = (await licenseRequest.call())[0];
+        res.status(200).send(negPoint);
+    } catch (err) {
+        return next(errorTranslator(err, [{
+            errStatus: 400,
+            resStatus: 449,
+            msg: 'user doesn\'t own the driving license'
+        }]));
     }
 
-    // show error if sb with no driving license tries to get his/her negative points
-    if (!license!.barcode) return next(new CustomError("you don't have a driving license", 400, 435));
-
-    const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/driving-licenses/${license!.printNumber}/negative-point`, req.token);
-
-    const negPoint = await request.call();
-
-    if (req.user!.negativePoint !== negPoint.negativePoint) {
-        req.user!.negativePoint = negPoint.negativePoint
-        req.user!.isDrivingAllowed = negPoint.isDrivingAllowed
-        await req.user!.save();
-    }
-
-    res.status(200).send(negPoint);
-})
+});
 
 export const getLicensePlates = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
@@ -133,7 +125,7 @@ export const getLicensePlates = catchAsync(async (req: Request, res: Response, n
 
     for (let plate of plates) {
 
-        const existedPlate = await SaveOrUpdatePlate(req.user!.nationalCode, plate, Plate);
+        const existedPlate = await SaveOrUpdateModel(req.user!.nationalCode, plate, Plate);
 
         // add national code to plates view
         plate.nationalCode = req.user!.nationalCode;
@@ -145,14 +137,14 @@ export const getLicensePlates = catchAsync(async (req: Request, res: Response, n
     }
 
     res.status(200).send(platesArr);
-})
+});
 
 export const getViolationReport = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${req.body.licensePlate}/violations/report`, req.token);
         const violations = await request.call();
 
-        const existedPlate = await SaveOrUpdatePlate(req.user!.nationalCode, { licensePlateNumber: req.body.licensePlate }, Plate);
+        const existedPlate = await SaveOrUpdateModel(req.user!.nationalCode, { licensePlateNumber: req.body.licensePlate }, Plate);
 
         let violationsUpdated = false;
 
@@ -174,8 +166,8 @@ export const getViolationReport = catchAsync(async (req: Request, res: Response,
 
         // only change total-payment info when violations have been changed
         if (violationsUpdated) {
-            let violationCopy = { ...violations }
-            delete violationCopy.violations
+            let violationCopy = { ...violations };
+            delete violationCopy.violations;
 
             for (let [k, v] of Object.entries(violationCopy)) {
                 existedPlate.totalViolationInfo[k] = v;
@@ -203,7 +195,7 @@ export const getViolationImage = catchAsync(async (req: Request, res: Response, 
         if (!violationId) return next(new CustomError('you must proved a violation id', 400, 438));
 
         // WARN: save data without validating it <by calling shayrad api to validate it> in the future might cause some problems
-        const plate = await SaveOrUpdatePlate(req.user!.nationalCode, { licensePlateNumber: req.body.licensePlate }, Plate);
+        const plate = await SaveOrUpdateModel(req.user!.nationalCode, { licensePlateNumber: req.body.licensePlate }, Plate);
 
         const existedPlate = await plate.populate({
             path: 'vehicleViolations',
@@ -239,14 +231,14 @@ export const getViolationAggregate = catchAsync(async (req: Request, res: Respon
     const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${req.body.licensePlate}/violations/aggregate`, req.token);
     const aggregateViolations = await request.call();
 
-    const existedPlate = await SaveOrUpdatePlate(req.user!.nationalCode, { licensePlateNumber: req.body.licensePlate }, Plate);
+    const existedPlate = await SaveOrUpdateModel(req.user!.nationalCode, { licensePlateNumber: req.body.licensePlate }, Plate);
 
     if (aggregateViolations.paymentId !== existedPlate.totalViolationInfo.paymentId || aggregateViolations.complaint !== existedPlate.totalViolationInfo.complaint) {
         for (let [k, v] of Object.entries(aggregateViolations)) {
             // plateChar is already saved
             if (k === 'plateChar') continue;
             // price is number for consistency cas it to string
-            if (existedPlate.totalViolationInfo[k] !== v) existedPlate.totalViolationInfo[k] = `${v}`
+            if (existedPlate.totalViolationInfo[k] !== v) existedPlate.totalViolationInfo[k] = `${v}`;
         }
         // for some who knows reasons mongoose only updates existedPlate.totalViolationInfo if we say to it manually that totalViolationInfo field have been changed so updated |-_-|
         existedPlate.markModified('totalViolationInfo');
@@ -254,19 +246,19 @@ export const getViolationAggregate = catchAsync(async (req: Request, res: Respon
     }
 
     res.status(200).send(aggregateViolations);
-})
+});
 
 export const getPlateDoc = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${req.body.licensePlate}/documents/status`, req.token);
         const status = await request.call();
 
-        const existedPlate = await SaveOrUpdatePlate(req.user!.nationalCode, { licensePlateNumber: req.body.licensePlate }, Plate);
+        const existedPlate = await SaveOrUpdateModel(req.user!.nationalCode, { licensePlateNumber: req.body.licensePlate }, Plate);
 
         for (let [k, v] of Object.entries(status)) {
             // plateChar is already saved
             if (k === 'plateChar') continue;
-            if ((existedPlate as any)[k] !== v) (existedPlate as any)[k] = v
+            if ((existedPlate as any)[k] !== v) (existedPlate as any)[k] = v;
         }
 
         if (existedPlate.isModified()) await existedPlate.save();
