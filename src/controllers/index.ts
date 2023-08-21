@@ -78,7 +78,7 @@ export const getNegativePoints = catchAsync(async (req: Request, res: Response, 
 
         await SaveOrUpdateModel({ nationalCode }, negPoint, User);
 
-        res.status(200).send(negPoint);
+        res.status(200).json(negPoint);
     } catch (err) {
         return next(errorTranslator(err, [{
             errStatus: 400,
@@ -111,7 +111,7 @@ export const getLicensePlates = catchAsync(async (req: Request, res: Response, n
         platesArr.push(plate);
     }
 
-    res.status(200).send(platesArr);
+    res.status(200).json(platesArr);
 });
 
 export const getViolationReport = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -155,7 +155,7 @@ export const getViolationReport = catchAsync(async (req: Request, res: Response,
             await existedPlate.save();
         }
 
-        res.status(200).send(violations);
+        res.status(200).json(violations);
     } catch (err) {
         return next(errorTranslator(err, [{
             errStatus: 400,
@@ -175,7 +175,7 @@ export const getViolationImage = catchAsync(async (req: Request, res: Response, 
 
         await SaveOrUpdateModel({ violationId }, image, Violation);
 
-        res.status(200).send(image);
+        res.status(200).json(image);
     } catch (err) {
         return next(errorTranslator(err, [{
             errStatus: 400,
@@ -208,9 +208,9 @@ export const getViolationAggregate = catchAsync(async (req: Request, res: Respon
         formattedData[k] = v;
     };
 
-    await SaveOrUpdateModel({ nationalCode, licensePlateNumber }, { totalViolationInfo: formattedData }, Plate);
+    const d = await SaveOrUpdateModel({ nationalCode, licensePlateNumber }, { totalViolationInfo: formattedData }, Plate);
 
-    res.status(200).send(aggregateViolations);
+    res.status(200).json(d);
 });
 
 export const getPlateDoc = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -223,7 +223,7 @@ export const getPlateDoc = catchAsync(async (req: Request, res: Response, next: 
 
         await SaveOrUpdateModel({ nationalCode, licensePlateNumber }, status, Plate);
 
-        res.status(200).send(status);
+        res.status(200).json(status);
     } catch (err) {
         return next(errorTranslator(err, [{
             errStatus: 500,
@@ -235,7 +235,6 @@ export const getPlateDoc = catchAsync(async (req: Request, res: Response, next: 
 
 export const getPassport = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-
     const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/passport/status`, req.token);
     const passport = await request.call();
 
@@ -245,26 +244,5 @@ export const getPassport = catchAsync(async (req: Request, res: Response, next: 
     // WARN: check if passportNo is unique or poetBarcode for each passport ???
     await SaveOrUpdateModel({ nationalCode, passportNo }, passport, Passport);
 
-    // let existedPassport: any;
-
-    // if (passport.hasPassport === false) {
-    //     existedPassport = await Passport.findOne({
-    //         nationalCode: req.user!.nationalCode
-    //     });
-    // }
-    // else {
-    //     // WARN: check if passportNo is unique or poetBarcode ???
-    //     existedPassport = await Passport.findOne({
-    //         passportNo: passport.passportNo
-    //     });
-    // }
-
-    // // if the passport isn't already existed in DB -> add new plate
-    // if (!existedPassport) {
-    //     const newPassport = new Passport(passport);
-    //     newPassport.nationalCode = req.user!.nationalCode;
-    //     await newPassport.save();
-    // }
-
-    res.status(200).send(passport);
+    res.status(200).json(passport);
 });

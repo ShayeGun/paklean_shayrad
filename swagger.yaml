@@ -69,8 +69,7 @@ definition:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/requests/WithOtp'
-                  - $ref: '#/components/requests/WithNoOtp'
+                  - $ref: '#/components/requests/withLicense'
         responses:
           '200':
             description: Success
@@ -242,6 +241,25 @@ definition:
             type: string
             required: true
             example: '09384009969'
+          otp:
+            type: string
+            required: true
+            example: '228897'
+      withLicense:
+        type: object
+        properties:
+          nationalCode:
+            type: string
+            required: true
+            example: '0022553975'
+          mobile:
+            type: string
+            required: true
+            example: '09384009969'
+          drivingLicense:
+            type: string
+            required: true
+            example: '9801955977'
           otp:
             type: string
             required: true

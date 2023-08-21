@@ -37,38 +37,38 @@ app.use('/api', limiter);
 
 // =========== END SECURITY ===========
 
-// // FIX: for production only
+// FIX: for production only
 // check validity of token with each request
-// app.use(catchAsync(async (req, res, next) => {
-//     await token.checkValidity()
-//     console.log(token.getToken());
-
-//     req.token = token;
-//     next()
-// }))
-
-// FIX: for development only
-app.get('/api/shayrad/v1/get-token', async (req, res, next) => {
+app.use(catchAsync(async (req, res, next) => {
     await token.checkValidity();
     console.log(token.getToken());
-    res.json(token.getToken());
-});
 
-app.use((req, res, next) => {
-    req.token = {
-        getToken() {
-            return {
-                "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTI2MTc5NjQsImV4cCI6MTY5MjYyMTU2NCwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MjYxNzk2NCwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.LZV1m-BDfPtAE8UsTOsU9IFC0hwYreVJrQ-9xC_mVsJuOpmUHzpiKFMiQcVFnFXANDr-4ZGSkLW45PP7NrEfP0Pt_KHOej_uwpXlgRyGa1E1gdMLIoVPRceg9mUUBlX9OZSbTzVi_pl8gYGXqkoKeym1i_egEueHQZi3R_zny1DUQ0eFg7rDAT2Po8QUfU4VrLVCQxAz8zmthbdrSE4orwYsakjM1O_rpsHbLvdZwj-hHzu33I4xgAgiHt2f3oqt8dKPY52nGtitG7oclO39DIZzxqUnfBry7YaApb8zIPlfJSQ421IH7uhkckLGzmwo7vbry8JX47lMPEPOvotJlg",
-                "tokenType": "Bearer",
-                "scope": "naji_api_scope",
-                "createdAt": 1692617972822,
-                "expiresIn": 3600000
-            };
-        }
-
-    };
+    req.token = token;
     next();
-});
+}));
+
+// FIX: for development only
+// app.get('/api/shayrad/v1/get-token', async (req, res, next) => {
+//     await token.checkValidity();
+//     console.log(token.getToken());
+//     res.json(token.getToken());
+// });
+
+// app.use((req, res, next) => {
+//     req.token = {
+//         getToken() {
+//             return {
+//                 "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTI2MjI0ODIsImV4cCI6MTY5MjYyNjA4MiwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MjYyMjQ4Miwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.lDA4_Y7rQOsXjEVzn6wOd_iJP_0KwsPLiBeJr4Q6QDahYyKN6lmL_HjftDs0LRGTGfKuPDT0ogziNREZP3FCNFth-NmiNNlsDwU88P8KumWPwpZOnWwNqzGo6hlbNfnUeF2SzSrBBbSA_A6Gg96eHHDUD7L7JegLIIav_0HaAyHoHGnsVi_hm6APQEps1KJWOWuO4yqn-zjaQrI4CZFrGopezPJD9LpQxYuN9violErx3qHNjxB-x4dlACf3TNrLjMLXNM-iqByEosVNYUM1p9Y8fuCM5zxj6gxVsRkThKYmMlA2cOjflLszkvxqLnX4KtlCFk2GmHNNhiu-d783KQ",
+//                 "tokenType": "Bearer",
+//                 "scope": "naji_api_scope",
+//                 "createdAt": 1692622490726,
+//                 "expiresIn": 3600000
+//             };
+//         }
+
+//     };
+//     next();
+// });
 
 const options = yaml.load(fs.readFileSync(`${__dirname}/../swagger.yaml`, 'utf8'));
 
