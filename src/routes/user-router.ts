@@ -5,6 +5,7 @@ import { User } from "../models/user";
 import { getPassport } from "../controllers/passport";
 import { checkPlate } from "../middlewares/check-plate";
 import { checkLicense } from "../middlewares/check-license";
+import { checkViolation } from "../middlewares/check-violation";
 
 const router = Router();
 
@@ -21,13 +22,13 @@ router.route('/license-plates/violations/report')
     .post(validateUser, checkPlate, getViolationReport);
 
 router.route('/license-plates/violations/image')
-    .post(validateUser, checkPlate, getViolationImage);
+    .post(validateUser, checkPlate, checkViolation, getViolationImage);
 
 router.route('/license-plates/violations/aggregate')
     .post(validateUser, checkPlate, getViolationAggregate);
 
 router.route('/license-plates/document')
-    .post(validateUser, getPlateDoc);
+    .post(validateUser, checkPlate, getPlateDoc);
 
 router.route('/passport')
     .post(validateUser, getPassport);

@@ -13,6 +13,7 @@ interface IViolation {
     hasImage: boolean,
     plateImage: string,
     vehicleImage: string,
+    licensePlateNumber: string;
 }
 
 interface IViolationMethods { }
@@ -20,6 +21,7 @@ interface IViolationMethods { }
 type ViolationModel = Model<IViolation, {}, IViolationMethods>;
 
 const violationSchema = new Schema<IViolation, ViolationModel, IViolationMethods>({
+    licensePlateNumber: String,
     violationId: String,
     violationOccuredDate: String,
     violationOccuredTime: String,
@@ -46,4 +48,4 @@ violationSchema.index({ violationId: 1 }, { unique: true });
 
 const Violation = model<IViolation, ViolationModel>('Violation', violationSchema);
 
-export { Violation }
+export { Violation };
