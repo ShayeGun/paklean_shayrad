@@ -2,34 +2,12 @@ import { Request, Response, NextFunction } from "express";
 import { catchAsync } from "../utils/catch-async";
 import { GetRequest } from "../utils/request-class/get-request";
 import { License } from "../models/driving-licence";
-import { PostRequest } from "../utils/request-class/post-request";
 import { Plate } from "../models/driving-plate";
-import { CustomError } from "../utils/custom-error";
 import { Violation } from "../models/plate-violations";
+import { Passport } from "../models/passport";
 import { errorTranslator } from "../utils/error-translator";
-import mongoose from "mongoose";
 import { User } from "../models/user";
-import { string } from "joi";
-
-const SaveOrUpdateModel = async <T extends typeof mongoose.Model>(identifier: Record<string, string>, data: Record<string, any>, model: T) => {
-    const existedData = await model.findOne(identifier);
-
-    if (!existedData) {
-        const newData = new model({ ...identifier, ...data });
-        newData.save();
-
-        return newData;
-    }
-    else {
-        for (let [k, v] of Object.entries(data)) {
-            if ((existedData as any)[k] !== v) (existedData as any)[k] = v;
-        }
-
-        if (existedData!.isModified()) await existedData!.save();
-
-        return existedData;
-    }
-};
+import { SaveOrUpdateModel } from "../utils/save-or-update-model";
 
 export const getDrivingLicenses = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/driving-licenses`, req.token);
@@ -43,8 +21,7 @@ export const getDrivingLicenses = catchAsync(async (req: Request, res: Response,
         const title = license.title;
         const printNumber = license.printNumber;
 
-        const d = await SaveOrUpdateModel({ nationalCode, title, printNumber }, license, License);
-        licensesArr.push(d);
+        await SaveOrUpdateModel({ nationalCode, title, printNumber }, license, License);
 
         // let existedLicense: any;
 
@@ -254,4 +231,40 @@ export const getPlateDoc = catchAsync(async (req: Request, res: Response, next: 
             msg: 'user doesn\'t own the license plate'
         }]));
     }
+});
+
+export const getPassport = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+
+    const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/passport/status`, req.token);
+    const passport = await request.call();
+
+    const nationalCode = req.user!.nationalCode;
+    const passportNo = passport.passportNo;
+
+    // WARN: check if passportNo is unique or poetBarcode for each passport ???
+    await SaveOrUpdateModel({ nationalCode, passportNo }, passport, Passport);
+
+    // let existedPassport: any;
+
+    // if (passport.hasPassport === false) {
+    //     existedPassport = await Passport.findOne({
+    //         nationalCode: req.user!.nationalCode
+    //     });
+    // }
+    // else {
+    //     // WARN: check if passportNo is unique or poetBarcode ???
+    //     existedPassport = await Passport.findOne({
+    //         passportNo: passport.passportNo
+    //     });
+    // }
+
+    // // if the passport isn't already existed in DB -> add new plate
+    // if (!existedPassport) {
+    //     const newPassport = new Passport(passport);
+    //     newPassport.nationalCode = req.user!.nationalCode;
+    //     await newPassport.save();
+    // }
+
+    res.status(200).send(passport);
 });

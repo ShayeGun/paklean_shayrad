@@ -1,8 +1,6 @@
 import { Router } from "express";
 import { validateUser } from "../middlewares/auth-controller";
-import { getDrivingLicenses, getNegativePoints, getLicensePlates, getViolationReport, getViolationImage, getViolationAggregate, getPlateDoc } from "../controllers/license-controller";
-import { User } from "../models/user";
-import { getPassport } from "../controllers/passport";
+import { getDrivingLicenses, getNegativePoints, getLicensePlates, getViolationReport, getViolationImage, getViolationAggregate, getPlateDoc, getPassport } from "../controllers";
 import { checkPlate } from "../middlewares/check-plate";
 import { checkLicense } from "../middlewares/check-license";
 import { checkViolation } from "../middlewares/check-violation";
@@ -32,12 +30,5 @@ router.route('/license-plates/document')
 
 router.route('/passport')
     .post(validateUser, getPassport);
-
-// FIX: for test only
-router.route('/test').get(async (req, res, next) => {
-    const user = await User.find({});
-
-    res.status(201).json(user);
-});
 
 export { router as userRoute };
