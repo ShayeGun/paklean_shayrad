@@ -3,7 +3,7 @@ import env from 'dotenv';
 import mongoose from "mongoose";
 import { checkEnvVar } from './utils/check-environment-variables';
 
-env.config({ path: `${__dirname}/.env` });
+env.config({ path: `${__dirname}/../.env` });
 
 // environment variables check
 checkEnvVar('PORT', 'TOKEN_URL', 'CLIENT_ID', 'CLIENT_SECRET', 'GRANT_TYPE', 'SERVER_ADDRESS', 'MONGODB_URL');
