@@ -8,6 +8,12 @@ import { Passport } from "../models/passport";
 import { errorTranslator } from "../utils/error-translator";
 import { User } from "../models/user";
 import { SaveOrUpdateModel } from "../utils/save-or-update-model";
+import { CustomError } from "../utils/custom-error";
+import { userSignupValidator } from "../utils/validator-checker/user-signup-validator";
+
+//========================================================
+// post routes business logics <get data from naja>
+//========================================================
 
 export const getDrivingLicenses = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/driving-licenses`, req.token);
@@ -221,7 +227,7 @@ export const getPlateDoc = catchAsync(async (req: Request, res: Response, next: 
         const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${licensePlateNumber}/documents/status`, req.token);
         const status = await request.call();
 
-        await SaveOrUpdateModel({ nationalCode, licensePlateNumber }, status, Plate);
+        await SaveOrUpdateModel({ nationalCode, licensePlateNumber }, { docs: status }, Plate);
 
         res.status(200).json(status);
     } catch (err) {
@@ -245,4 +251,39 @@ export const getPassport = catchAsync(async (req: Request, res: Response, next: 
     await SaveOrUpdateModel({ nationalCode, passportNo }, passport, Passport);
 
     res.status(200).json(passport);
+});
+
+
+//========================================================
+// get routes business logics <fetch data from local DB>
+//========================================================
+
+export const fetchPlates = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { nationalCode, mobile } = req.params;
+
+    await userSignupValidator.validateAsync({ mobile, nationalCode });
+
+    const existedUser = await User.findOne({ nationalCode, mobile });
+
+    if (!existedUser) throw new CustomError('no such user exists', 400, 400);
+
+    const selectionFields = "serial licensePlateNumber description separationDate licensePlate nationalCode vehicleType formattedPlate";
+
+    const plates = await Plate.find({ nationalCode }).select(selectionFields);
+
+    res.status(200).json(plates);
+});
+
+export const fetchLicenses = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { nationalCode, mobile } = req.params;
+
+    await userSignupValidator.validateAsync({ mobile, nationalCode });
+
+    const existedUser = await User.findOne({ nationalCode, mobile });
+
+    if (!existedUser) throw new CustomError('no such user exists', 400, 400);
+
+    const licenses = await License.find({ nationalCode });
+
+    res.status(200).json(licenses);
 });

@@ -5,7 +5,7 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import logger from 'morgan';
 import ExpressMongoSanitize from 'express-mongo-sanitize';
-import { userRoute } from './routes/user-router';
+import { userRoute } from './routes/index-router';
 import { errorHandler } from './middlewares/error-handler';
 import { CustomError } from './utils/custom-error';
 import { token } from './utils/token';
@@ -41,8 +41,6 @@ app.use('/api', limiter);
 // check validity of token with each request
 app.use(catchAsync(async (req, res, next) => {
     await token.checkValidity();
-    console.log(token.getToken());
-
     req.token = token;
     next();
 }));

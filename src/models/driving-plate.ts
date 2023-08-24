@@ -75,12 +75,15 @@ interface IPlate {
     formattedPlate: Record<string, any>,
     totalViolationInfo: Record<string, any>,
     vehicleViolations: Types.ObjectId[],
-    cardPrintDate: string,
-    cardPostalBarcode: string,
-    cardStatusTitle: string,
-    documentPrintDate: string,
-    documentPostalBarcode: string,
-    documentStatusTitle: string,
+    docs: {
+        cardPrintDate: string,
+        cardPostalBarcode: string,
+        cardStatusTitle: string,
+        documentPrintDate: string,
+        documentPostalBarcode: string,
+        documentStatusTitle: string,
+    };
+
 }
 
 interface IPlateMethods { }
@@ -105,12 +108,16 @@ const plateSchema = new Schema<IPlate, PlateModel, IPlateMethods>({
         type: Schema.Types.Mixed,
         default: {}
     },
-    cardPrintDate: String,
-    cardPostalBarcode: String,
-    cardStatusTitle: String,
-    documentPrintDate: String,
-    documentPostalBarcode: String,
-    documentStatusTitle: String,
+    docs: {
+        type: {
+            cardPrintDate: String,
+            cardPostalBarcode: String,
+            cardStatusTitle: String,
+            documentPrintDate: String,
+            documentPostalBarcode: String,
+            documentStatusTitle: String,
+        }
+    }
 }, {
     toJSON: {
         // not show __v , _id 
