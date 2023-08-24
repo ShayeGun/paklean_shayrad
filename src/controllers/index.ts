@@ -19,8 +19,6 @@ export const getDrivingLicenses = catchAsync(async (req: Request, res: Response,
     const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/driving-licenses`, req.token);
     const licenses = await request.call();
 
-    let licensesArr: Record<string, any>[] = [];
-
     for (let license of licenses) {
 
         const nationalCode = req.body.nationalCode;
@@ -29,50 +27,10 @@ export const getDrivingLicenses = catchAsync(async (req: Request, res: Response,
 
         await SaveOrUpdateModel({ nationalCode, title, printNumber }, license, License);
 
-        // let existedLicense: any;
-
-        // if (license.nationalCode === null) {
-        //     existedLicense = await License.findOne({
-        //         nationalCode: req.user!.nationalCode
-        //     });
-        // }
-        // else {
-        //     existedLicense = await License.findOne({
-        //         barcode: license.barcode,
-        //         title: license.title
-        //     });
-        // }
-
-        // // if the license isn't already existed in DB -> add new license
-        // if (!existedLicense) {
-        //     const newLicense = new License(license);
-        //     // for user's that don't have license (license.nationalCode = null)
-        //     newLicense.nationalCode = req.user!.nationalCode;
-        //     await newLicense.save();
-
-        //     // update user's first and last name if its not defined -- shayrad's doing not mine sry )^,_^)
-        //     if (req.user!.firstName === "-" || req.user!.lastName === "-") {
-        //         // for user's that don't have license (license.firstName = null)
-
-        //         req.user!.firstName = license.firstName ? license.firstName : "-";
-        //         // for user's that don't have license (license.lastName = null)
-        //         req.user!.lastName = license.lastName ? license.lastName : "-";
-
-        //         await req.user!.save();
-        //         licensesArr.push(newLicense);
-        //         continue;
-        //     }
-        // }
-
-        // // add national code to plates view
-        // license.nationalCode = req.user!.nationalCode;
-        // // for consistency in api
-        // delete license.firstName;
-        // delete license.lastName;
-        // licensesArr.push(license);
+        await SaveOrUpdateModel({ userId: req.user!.userId }, { firstName: license.firstName, lastName: license.lastName }, User);
     }
 
-    res.status(200).send(licensesArr);
+    res.status(200).send(licenses);
 });
 
 export const getNegativePoints = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
