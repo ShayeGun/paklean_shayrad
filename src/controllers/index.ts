@@ -120,6 +120,10 @@ export const getViolationImage = catchAsync(async (req: Request, res: Response, 
         const licensePlateNumber = req.body.licensePlate;
         const violationId = req.body.violationId;
 
+        const existedViolation = await SaveOrUpdateModel({ violationId }, {}, Violation);
+
+        if (!existedViolation.hasImage) throw new CustomError('violation doesn\'t have an image', 400, 467);
+
         const request = new GetRequest(`${process.env.SERVER_ADDRESS}/naji/users/${req.user!.userId}/vehicles/${licensePlateNumber}/violations/${violationId}/image`, req.token);
         const image = await request.call();
 
