@@ -58,6 +58,36 @@ definition:
               application/json:
                 schema:
                   $ref: '#/components/schemas/CustomError'
+    /user/driving-licenses/{nationalCode}/{mobile}:
+      get:
+        tags:
+          - Licenses
+        summary: get all driving licenses saved in EVC database
+        description: get all user licenses
+        parameters:
+          - name: nationalCode
+            in: path
+            required: true
+            schema:
+              type: string
+          - name: mobile
+            in: path
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/DrivingLicense'
+          '400':
+            description: Failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CustomError'
     /user/driving-licenses/negative-points:
       post:
         tags:
@@ -96,6 +126,36 @@ definition:
                 oneOf:
                   - $ref: '#/components/requests/WithOtp'
                   - $ref: '#/components/requests/WithNoOtp'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/LicensePlate'
+          '400':
+            description: Failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CustomError'
+    /user/license-plates/{nationalCode}/{mobile}:
+      get:
+        tags:
+          - Plates
+        summary: get all license plates saved in EVC database
+        description: get all user license plates
+        parameters:
+          - name: nationalCode
+            in: path
+            required: true
+            schema:
+              type: string
+          - name: mobile
+            in: path
+            required: true
+            schema:
+              type: string
         responses:
           '200':
             description: Success

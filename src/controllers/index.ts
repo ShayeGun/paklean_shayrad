@@ -87,37 +87,23 @@ export const getViolationReport = catchAsync(async (req: Request, res: Response,
 
         const existedPlate = await SaveOrUpdateModel({ nationalCode, licensePlateNumber }, { licensePlateNumber }, Plate);
 
-        let violationsUpdated = false;
+        // clear previous violation active records in DB
+        let newViolations = [];
 
         for (let violation of violations.violations) {
-            const existedViolation = await Violation.findOne({ violationId: violation.violationId });
 
-            // violation which exist violationId != "0" and is not already saved in DB 
-            if (violation.violationId !== "0" && !existedViolation) {
-                const newViolation = new Violation({ ...violation, licensePlateNumber });
-                await newViolation.save();
-
-                // WARN: don't know if its good to push each violation one by one and save them or add them all together and then save them all at once ???
-                existedPlate.vehicleViolations.push(newViolation._id);
-                await existedPlate.save();
-
-                violationsUpdated = true;
-            }
+            const existedViolation = await SaveOrUpdateModel({ violationId: violation.violationId }, { ...violation, licensePlateNumber }, Violation);
+            newViolations.push(existedViolation._id);
         }
 
-        // only change total-payment info when violations have been changed
-        if (violationsUpdated) {
-            let violationCopy = { ...violations };
-            delete violationCopy.violations;
+        const { violations: _, ...totalViolationInfo } = violations;
+        existedPlate.totalViolationInfo = totalViolationInfo;
+        existedPlate.vehicleViolations = newViolations;
 
-            for (let [k, v] of Object.entries(violationCopy)) {
-                existedPlate.totalViolationInfo[k] = v;
-            }
-
-            // for some who knows reasons mongoose only updates existedPlate.totalViolationInfo if we say to it manually that totalViolationInfo field have been changed so updated |-_-|
-            existedPlate.markModified('totalViolationInfo');
-            await existedPlate.save();
-        }
+        // for some who knows reasons mongoose only updates existedPlate.totalViolationInfo if we say to it manually that totalViolationInfo field have been changed so updated |-_-|
+        existedPlate.markModified('totalViolationInfo');
+        existedPlate.markModified('vehicleViolations');
+        await existedPlate.save();
 
         res.status(200).json(violations);
     } catch (err) {
