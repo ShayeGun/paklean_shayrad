@@ -39,34 +39,34 @@ app.use('/api', limiter);
 
 // FIX: for production only
 // check validity of token with each request
-// app.use(catchAsync(async (req, res, next) => {
-//     await token.checkValidity();
-//     req.token = token;
-//     next();
-// }));
+app.use(catchAsync(async (req, res, next) => {
+    await token.checkValidity();
+    req.token = token;
+    next();
+}));
 
 // FIX: for development only
-app.get('/api/shayrad/v1/get-token', async (req, res, next) => {
-    await token.checkValidity();
-    console.log(token.getToken());
-    res.json(token.getToken());
-});
+// app.get('/api/shayrad/v1/get-token', async (req, res, next) => {
+//     await token.checkValidity();
+//     console.log(token.getToken());
+//     res.json(token.getToken());
+// });
 
-app.use((req, res, next) => {
-    req.token = {
-        getToken() {
-            return {
-                "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTI2MjI0ODIsImV4cCI6MTY5MjYyNjA4MiwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MjYyMjQ4Miwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.lDA4_Y7rQOsXjEVzn6wOd_iJP_0KwsPLiBeJr4Q6QDahYyKN6lmL_HjftDs0LRGTGfKuPDT0ogziNREZP3FCNFth-NmiNNlsDwU88P8KumWPwpZOnWwNqzGo6hlbNfnUeF2SzSrBBbSA_A6Gg96eHHDUD7L7JegLIIav_0HaAyHoHGnsVi_hm6APQEps1KJWOWuO4yqn-zjaQrI4CZFrGopezPJD9LpQxYuN9violErx3qHNjxB-x4dlACf3TNrLjMLXNM-iqByEosVNYUM1p9Y8fuCM5zxj6gxVsRkThKYmMlA2cOjflLszkvxqLnX4KtlCFk2GmHNNhiu-d783KQ",
-                "tokenType": "Bearer",
-                "scope": "naji_api_scope",
-                "createdAt": 1692622490726,
-                "expiresIn": 3600000
-            };
-        }
+// app.use((req, res, next) => {
+//     req.token = {
+//         getToken() {
+//             return {
+//                 "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyNUNFNDQ5OEU3MzQyNEJEMTlEOUY3OUQ3NEIyOEFEIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2OTMwMzMwNTEsImV4cCI6MTY5MzAzNjY1MSwiaXNzIjoiaHR0cHM6Ly9hdXRoLnNoYXlyYWQuaXIiLCJjbGllbnRfaWQiOiJzaC1uYWctcGFrbGVhbiIsImlhdCI6MTY5MzAzMzA1MSwic2NvcGUiOlsibmFqaV9hcGlfc2NvcGUiXX0.GnAmb4V9ll_SfTDeLZCmUPYc34SS1J038cFJ1QG6THtxZvMwogadgIeGFLcDjZyljvALDWdPPFaEXjxk7U3tGEH1gn7azMLAu7U2T5Q1GNBpJOAu3VrAjX8rbJdK4o7xnbPdt5xFeWrlgNQTEdjkiBdKI9a0va7HOP6GB2le1d5nXcui8auasQiMGUuysQtioFn4a2Pm7cOS-lBBpr18-iS8AmD-DAK9yW5uFC9fAgXaB_4Vkulk5USvRnYwFj1jAyzyBWQ-sPzBiDdfFtnBY2ab1IxlqYjY_ZvIal2l2v3G2ixojp7d8PKok6Ws-e5Cq4MNtcoAmmxglNrHckbZpQ",
+//                 "tokenType": "Bearer",
+//                 "scope": "naji_api_scope",
+//                 "createdAt": 1693033059290,
+//                 "expiresIn": 3600000
+//             };
+//         }
 
-    };
-    next();
-});
+//     };
+//     next();
+// });
 
 const options = yaml.load(fs.readFileSync(`${__dirname}/../swagger.yaml`, 'utf8'));
 
