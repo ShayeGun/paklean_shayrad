@@ -4,8 +4,16 @@ import { getDrivingLicenses, getNegativePoints, getLicensePlates, getViolationRe
 import { checkPlate } from "../middlewares/check-plate";
 import { checkLicense } from "../middlewares/check-license";
 import { checkViolation } from "../middlewares/check-violation";
+import { } from "typescript";
 
 const router = Router();
+
+router.route('/check')
+    .post(validateUser, (req, res) => {
+        res.status(200).json({
+            exist: true
+        });
+    });
 
 router.route('/driving-licenses')
     .post(validateUser, getDrivingLicenses);
