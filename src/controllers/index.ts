@@ -233,9 +233,12 @@ export const fetchLicenses = catchAsync(async (req: Request, res: Response, next
 
     const existedUser = await User.findOne({ nationalCode, mobile });
 
+    const firstName = existedUser!.firstName,
+        lastName = existedUser!.lastName;
+
     if (!existedUser) throw new CustomError('no such user exists', 400, 400);
 
     const licenses = await License.find({ nationalCode });
 
-    res.status(200).json(licenses);
+    res.status(200).json({ licenses, firstName, lastName });
 });
