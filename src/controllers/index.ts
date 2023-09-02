@@ -206,6 +206,20 @@ export const getPassport = catchAsync(async (req: Request, res: Response, next: 
 // get routes business logics <fetch data from local DB>
 //========================================================
 
+const mongooseFormatter = (obj: any, addData: any, removeData: string[] = ["_id", "__v"]) => {
+    let copyLicense: any = obj._doc;
+
+    for (let [k, v] of Object.entries(addData)) {
+        copyLicense[k] = v;
+    }
+
+    for (let r of removeData) {
+        delete copyLicense[r];
+    }
+
+    return copyLicense;
+};
+
 export const fetchPlates = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { nationalCode, mobile } = req.params;
 
@@ -240,5 +254,11 @@ export const fetchLicenses = catchAsync(async (req: Request, res: Response, next
 
     const licenses = await License.find({ nationalCode });
 
-    res.status(200).json({ licenses, firstName, lastName });
+    const formattedLicenses = [];
+    for (let license of licenses) {
+        const copyLicense = mongooseFormatter(license, { firstName, lastName });
+        formattedLicenses.push(copyLicense);
+    }
+
+    res.status(200).json(formattedLicenses);
 });
