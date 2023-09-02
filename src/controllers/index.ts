@@ -213,13 +213,17 @@ export const fetchPlates = catchAsync(async (req: Request, res: Response, next: 
 
     const existedUser = await User.findOne({ nationalCode, mobile });
 
+    const firstName = existedUser!.firstName,
+        lastName = existedUser!.lastName;
+
+
     if (!existedUser) throw new CustomError('no such user exists', 400, 400);
 
     const selectionFields = "serial licensePlateNumber description separationDate licensePlate nationalCode vehicleType formattedPlate";
 
     const plates = await Plate.find({ nationalCode }).select(selectionFields);
 
-    res.status(200).json(plates);
+    res.status(200).json({ plates, firstName, lastName });
 });
 
 export const fetchLicenses = catchAsync(async (req: Request, res: Response, next: NextFunction) => {

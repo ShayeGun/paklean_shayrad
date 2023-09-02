@@ -81,7 +81,7 @@ definition:
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/DrivingLicense'
+                  $ref: '#/components/schemas/LicensePlateSaved'
           '400':
             description: Failed
             content:
@@ -443,6 +443,59 @@ definition:
                 - car
                 - cycle
               example: car
+      LicensePlateSaved:
+        type: object
+        properties:
+          plates:
+            type: array
+            items:
+              type: object
+              properties:
+                nationalCode:
+                  type: string
+                  example: '0083084304'
+                serial:
+                  type: string
+                  example: '10100441445188'
+                licensePlateNumber:
+                  type: string
+                  example: '400479696'
+                description:
+                  type: string
+                  example: null
+                separationDate:
+                  type: string
+                  example: null
+                licensePlate:
+                  type: string
+                  example: 'ایران ۴۰ - ۶۹۶ ج  ۷۹'
+                formattedPlate:
+                  type: object
+                  properties:
+                    provenance:
+                      type: string
+                      example: '40'
+                    letter:
+                      type: string
+                      example: 'ج'
+                    leftSection:
+                      type: string
+                      example: '79'
+                    rightSection:
+                      type: string
+                      example: '696'
+                vehicleType:
+                  type: string
+                  enum:
+                    - car
+                    - cycle
+                  example: car
+          firstName:
+            type: string
+            example: 'محمد'
+          lastName:
+            type: string
+            example: 'محمدی'
       PlateDoc:
         type: object
         properties:
