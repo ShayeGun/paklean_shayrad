@@ -2,7 +2,7 @@ import { Model, model, Schema, Types } from 'mongoose';
 
 function getVehicleType(plateNum: string) {
     if (plateNum.length === 9) return vehicle.car;
-    else if (plateNum.length === 11 && plateNum.slice(0, 2) === "08") return vehicle.cycle;
+    else if (plateNum.length === 13 && plateNum.slice(0, 2) === "08") return vehicle.cycle;
     // future plate types
     return vehicle.else;
 }
