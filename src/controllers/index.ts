@@ -11,6 +11,16 @@ import { SaveOrUpdateModel } from "../utils/save-or-update-model";
 import { CustomError } from "../utils/custom-error";
 import { userSignupValidator } from "../utils/validator-checker/user-signup-validator";
 
+const selectNeededFields = (object: any, selectionFields: string[]) => {
+    const dCopy: Record<string, any> = {};
+
+    for (let [k, v] of Object.entries(object._doc)) {
+        if (selectionFields.includes(k)) dCopy[k] = v;
+    }
+
+    return dCopy;
+};
+
 //========================================================
 // post routes business logics <get data from naja>
 //========================================================
@@ -105,7 +115,10 @@ export const getViolationReport = catchAsync(async (req: Request, res: Response,
         existedPlate.markModified('vehicleViolations');
         await existedPlate.save();
 
-        res.status(200).json(violations);
+        const selectionFields = ["vehicleType", "formattedPlate"];
+        const plateData = selectNeededFields(existedPlate, selectionFields);
+
+        res.status(200).json({ ...violations, ...plateData });
     } catch (err) {
         return next(errorTranslator(err, [{
             errStatus: 400,
@@ -164,7 +177,10 @@ export const getViolationAggregate = catchAsync(async (req: Request, res: Respon
 
     const d = await SaveOrUpdateModel({ nationalCode, licensePlateNumber }, { totalViolationInfo: formattedData }, Plate);
 
-    res.status(200).json(d);
+    const selectionFields = ["nationalCode", "licensePlateNumber", "totalViolationInfo", "vehicleType", "formattedPlate"];
+    const dCopy = selectNeededFields(d, selectionFields);
+
+    res.status(200).json(dCopy);
 });
 
 export const getPlateDoc = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
